@@ -17,19 +17,22 @@ type XmlValue = number | bigint | boolean | string;
 
 /** A node in an XML DOM. */
 export interface XmlNode {
-  //#region Getters
+  //#region Properties
 
   /**
-   * An object containing the attributes of this node. This is guaranteed to be
-   * an object if the node is able to have attributes, but if it cannot have
-   * attributes (e.g. value nodes, comment nodes), it is undefined.
+   * Object containing the attributes of this node. Guaranteed to be an object
+   * if this node is able to have attributes, but if it cannot have attributes
+   * (e.g. value nodes, comment nodes), it is undefined.
    */
   get attributes(): Attributes;
 
   /**
    * The first child of this node. If there are no children, it is undefined.
+   * If this node cannot have children, then an exception is thrown when setting
+   * this property.
    */
   get child(): XmlNode;
+  set child(child: XmlNode);
 
   /**
    * The children of this node. This is guaranteed to be an array if this node
@@ -41,84 +44,60 @@ export interface XmlNode {
   /** Whether or not this node has an array for children. */
   get hasChildren(): boolean;
 
-  /** Shorthand for the `s` attribute. */
+  /**
+   * Shorthand for the `s` attribute. If this node cannot have attributes, an
+   * exception is thrown when setting this property.
+   */
   get id(): string | number | bigint;
+  set id(id: string | number | bigint);
 
-  /** The value of this node's first child, if it has one. */
+  /** 
+   * The value of this node's first child, if it has one. If this node cannot
+   * have children, or if its first child cannot have a value, an exception is
+   * thrown when setting this property.
+   */
   get innerValue(): XmlValue;
+  set innerValue(value: XmlValue);
 
-  /** Shorthand for the `n` attribute. */
+  /**
+   * Shorthand for the `n` attribute. If this node cannot have attributes, an
+   * exception is thrown when setting this property.
+   */
   get name(): string;
+  set name(name: string);
 
   /** The number of children on this node. */
   get numChildren(): number;
 
-  /** The tag of this node. */
+  /**
+   * The tag of this node. If this node is not an element or if the given tag is
+   * not a non-empty string, an exception is thrown when setting this property.
+   */
   get tag(): string;
-
-  /** Shorthand for the `t` attribute. */
-  get type(): string;
-
-  /** The value of this node. */
-  get value(): XmlValue;
-
-  //#endregion Getters
-
-  //#region Setters
-
-  /**
-   * Sets the first child of this node, if it can have children. If it cannot,
-   * an error is thrown. If it can have children, but doesn't one is added.
-   */
-  set child(child: XmlNode);
-
-  /**
-   * Shorthand for setting the `s` attribute. If this node is not an element, an
-   * exception is thrown.
-   */
-  set id(id: string | number | bigint);
-
-  /**
-   * Shorthand for setting the value of this node's first child. If this node
-   * cannot have children, or if its first child cannot have a value, an
-   * exception is thrown. If this node can have children, but doesn't, one will
-   * be created.
-   */
-  set innerValue(value: XmlValue);
-
-  /**
-   * Shorthand for setting the `n` attribute. If this node is not an element, an
-   * exception is thrown.
-   */
-  set name(name: string);
-
-  /**
-   * Sets the tag of this node. If this node is not an element or if the given
-   * tag is not a non-empty string, an exception is thrown.
-   */
   set tag(tag: string);
 
   /**
-   * Shorthand for setting the `t` attribute. If this node is not an element, an
-   * exception is thrown.
+   * Shorthand for the `t` attribute. If this node cannot have attributes, an
+   * exception is thrown when setting this property.
    */
+  get type(): string;
   set type(type: string);
 
   /**
-   * Sets the value of this node. If this node cannot have a value (i.e. it has
-   * children instead), an exception is thrown.
+   * The value of this node. If this node cannot have a value (i.e. it has
+   * children instead), an exception is thrown when setting this property.
    */
+  get value(): XmlValue;
   set value(value: XmlValue);
 
-  //#endregion Setters
+  //#endregion Properties
 
   //#region Methods
 
   /**
    * Adds the given children to this node by object reference. If you are adding
    * these children to multiple nodes and plan on mutating them, it is
-   * recommended that you use `addClones()` instead in order to prevent 
-   * unexpected mutation.
+   * recommended that you use `addClones()` instead.
    * 
    * @param children Child nodes to append to this one
    * @throws If this node cannot have children
@@ -176,7 +155,7 @@ export interface XmlNode {
    * 
    * @param options Object containing options for serializing
    */
-  toXml(options?: { indents?: number; spacesPerIndent?: number;}): string;
+  toXml(options?: { indents?: number; spacesPerIndent?: number; }): string;
 
   //#endregion Methods
 }
