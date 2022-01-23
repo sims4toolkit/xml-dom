@@ -334,6 +334,12 @@ abstract class XmlNodeBase implements XmlNode {
 
 /** A complete XML document with children. */
 export class XmlDocumentNode extends XmlNodeBase {
+  /**
+   * Creates a new XmlDocumentNode from the given root node. If no root node
+   * is given, then this document is empty.
+   * 
+   * @param root Optional node to use at the root of this document
+   */
   constructor(root?: XmlNode) {
     super({ children: (root ? [root] : []) })
   }
@@ -346,9 +352,11 @@ export class XmlDocumentNode extends XmlNodeBase {
    * - `allowMultipleRoots`: Whether or not the document should still be created
    * if it will have multiple roots. If false, an exception will be thrown if
    * there is more than one root element. (Default = false)
+   * - `ignoreComments`: Whether or not comments should be ignored. If false,
+   * comments will be parsed. (Default = false)
    * 
    * @param xml XML document to parse as a node
-   * @param options Object containing options
+   * @param options Optional object containing options
    */
   static from(xml: string | Buffer, {
     allowMultipleRoots = false,
@@ -401,6 +409,16 @@ export class XmlDocumentNode extends XmlNodeBase {
 
 /** A node with a tag, attributes, and children. */
 export class XmlElementNode extends XmlNodeBase {
+  /**
+   * Creates a new XmlElementNode with the given tag, attributes, and children.
+   * 
+   * Arguments:
+   * - `tag`: Required. The tag to use for this node.
+   * - `attributes`: An object for the attributes of this node. (Default = {})
+   * - `children`: An array for the children of this node. (Default = [])
+   * 
+   * @param args Arguments for construction 
+   */
   constructor({ tag, attributes = {}, children = [] }: {
     tag: string;
     attributes?: Attributes;
@@ -457,6 +475,11 @@ export class XmlElementNode extends XmlNodeBase {
 
 /** A node that contains a single value. */
 export class XmlValueNode extends XmlNodeBase {
+  /**
+   * Creates a new XmlValueNode with the given value.
+   * 
+   * @param value Optional value of this node.
+   */
   constructor(value?: XmlValue) {
     super({ value });
   }
