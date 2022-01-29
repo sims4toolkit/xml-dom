@@ -496,6 +496,13 @@ describe('XmlDocumentNode', function() {
     });
   });
 
+  describe("#findChild()", () => {
+    it("should return undefined", () => {
+      const node = newNode();
+      expect(node.findChild("name")).to.be.undefined;
+    });
+  });
+
   describe('#sort()', function() {
     it('should sort in alphabetical order by name if no fn passed in', function() {
       const node = newNode();
@@ -1054,6 +1061,45 @@ describe('XmlElementNode', function() {
     });
   });
 
+  describe("#findChild()", () => {
+    it("should return undefined if the child doesn't exist", () => {
+      const node = new XmlElementNode({
+        tag: "U",
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            attributes: { n: "first" },
+          }),
+          new XmlElementNode({
+            tag: "E",
+            attributes: { n: "second" }
+          })
+        ]
+      });
+
+      expect(node.findChild("third")).to.be.undefined;
+    });
+
+    it("should return the first child with the given name", () => {
+      const node = new XmlElementNode({
+        tag: "U",
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            attributes: { n: "first" },
+          }),
+          new XmlElementNode({
+            tag: "E",
+            attributes: { n: "second" }
+          })
+        ]
+      });
+
+      expect(node.findChild("first").tag).to.equal("T");
+      expect(node.findChild("second").tag).to.equal("E");
+    });
+  });
+
   describe('#sort()', function() {
     it('should sort in alphabetical order by name if no fn passed in', function() {
       const node = new XmlElementNode({
@@ -1454,6 +1500,13 @@ describe('XmlValueNode', function() {
     });
   });
 
+  describe("#findChild()", () => {
+    it("should throw", () => {
+      const node = newNode();
+      expect(() => node.findChild("")).to.throw();
+    });
+  });
+
   describe('#sort()', function() {
     it('should throw', function () {
       const node = newNode();
@@ -1694,6 +1747,13 @@ describe('XmlCommentNode', function() {
     it('should throw', function () {
       const node = newNode();
       expect(() => node.deepSort()).to.throw();
+    });
+  });
+
+  describe("#findChild()", () => {
+    it("should throw", () => {
+      const node = newNode();
+      expect(() => node.findChild("")).to.throw();
     });
   });
 

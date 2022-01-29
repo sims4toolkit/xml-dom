@@ -131,6 +131,16 @@ export interface XmlNode {
   deepSort(compareFn?: (a: XmlNode, b: XmlNode) => number): void;
 
   /**
+   * Finds and returns the first child that has the given name. If no children
+   * have this name, undefined is returned. If this node cannot have children,
+   * an exception is thrown.
+   * 
+   * @param name Name attribute of child to find
+   * @throws If this node cannot have children
+   */
+  findChild(name: string): XmlNode;
+
+  /**
    * Sorts the children of this node using the provided function. If no function
    * is given, they are sorted in ascending alphanumeric order by their `n`
    * attribute (their name). Children without names will retain their order
@@ -290,6 +300,12 @@ abstract class XmlNodeBase implements XmlNode {
     this.children.forEach(child => {
       if (child.children) child.deepSort(compareFn);
     });
+  }
+
+  findChild(name: string): XmlNode {
+    if (!this.hasChildren)
+      throw new Error("Cannot find child for childless node.");
+    return this.children.find(child => child.name === name);
   }
 
   sort(compareFn?: (a: XmlNode, b: XmlNode) => number): void {
