@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.2] - 2022/01/29
 ### Added
-- First release.
+- Added `findChild()` method on XmlNode.
 
 ## [0.1.1] - 2022/01/23
 ### Changed
