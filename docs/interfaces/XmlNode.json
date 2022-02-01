@@ -1,0 +1,247 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "imports": [
+    "import type { XmlNode } from \"@s4tk/xml-dom\"; // TypeScript only"
+  ],
+  "header": {
+    "title": {
+      "prefix": "interface",
+      "name": "XmlNode"
+    },
+    "description": "A node in an XML document model.",
+    "sourceCode": "src/xml.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "prefix": "get",
+          "name": "attributes",
+          "description": "Object containing the attributes of this node. If this node cannot have attributes, it is undefined.",
+          "type": {
+            "name": "object"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get, set",
+          "name": "child",
+          "description": "The first child of this node, if it can have children. If the node cannot have children, an exception is thrown when set.",
+          "type": {
+            "name": "XmlNode"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get",
+          "name": "children",
+          "description": "The children of this node. This is guaranteed to be an array if the node can have children, but if it can't, it is undefined.",
+          "type": {
+            "name": "XmlNode[]"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get",
+          "name": "hasChildren",
+          "description": "Whether or not this node has an array of children (that is, it can have children). Note that this does NOT return false if the children array is empty. A more accurate name would be 'canHaveChildren', but hindsight is 20/20.",
+          "type": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get, set",
+          "name": "id",
+          "description": "Shorthand for the 's' attribute. If this node cannot have attributes, an exception is thrown when setting.",
+          "type": {
+            "name": "string | number | bigint"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get, set",
+          "name": "innerValue",
+          "description": "The value of this node's first child, if it has one. If this node cannot have children, or if its first child cannot have a value, an exception is thrown when setting.",
+          "type": {
+            "name": "XmlValue",
+            "path": {
+              "pkg": "xml-dom",
+              "group": "types",
+              "item": "XmlValue"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get, set",
+          "name": "name",
+          "description": "Shorthand for the 'n' attribute. If this node cannot have attributes, an exception is thrown when setting.",
+          "type": {
+            "name": "string"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get",
+          "name": "numChildren",
+          "description": "Number of children on this node.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get, set",
+          "name": "tag",
+          "description": "The tag of this node. If this node is not an element or if the provided tag is not a non-empty string, an exception is thrown when setting.",
+          "type": {
+            "name": "string"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get, set",
+          "name": "type",
+          "description": "Shorthand for the 't' attribute. If this node cannot have attributes, an exception is thrown when setting.",
+          "type": {
+            "name": "string"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get, set",
+          "name": "value",
+          "description": "The value of this node. If this node cannot have a value, an exception is thrown when setting.",
+          "type": {
+            "name": "XmlValue",
+            "path": {
+              "pkg": "xml-dom",
+              "group": "types",
+              "item": "XmlValue"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Methods",
+      "content": [
+        {
+          "displayType": "function",
+          "name": "addChildren",
+          "description": "Adds the given children to this node, if it can. If it can't, an exception is thrown.",
+          "arguments": [
+            {
+              "name": "...children",
+              "description": "Child nodes to append.",
+              "type": {
+                "name": "XmlNode[]"
+              }
+            }
+          ],
+          "examples": [
+            {
+              "code": "node.addChildren(otherNode);\nnode.addChildren(otherNode, anotherNode, yetAnotherNode);"
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "name": "addClones",
+          "description": "Clones the given nodes, and then adds them as children to this one, if it can. If it can't, an exception is thrown.",
+          "arguments": [
+            {
+              "name": "...children",
+              "description": "Child nodes to clone and append.",
+              "type": {
+                "name": "XmlNode[]"
+              }
+            }
+          ],
+          "examples": [
+            {
+              "code": "node.addClones(otherNode);\nnode.addClones(otherNode, anotherNode, yetAnotherNode);"
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "name": "clone",
+          "description": "Returns a deep copy of this node.",
+          "returnType": {
+            "name": "XmlNode"
+          }
+        },
+        {
+          "displayType": "function",
+          "name": "deepSort",
+          "description": "Calls the 'sort()' method on this node and all of its descendants.",
+          "arguments": [
+            {
+              "name": "compareFn",
+              "optional": true,
+              "description": "Function to use when sorting children. If not provided, children are sorted alphanumerically by their 'n' attribute.",
+              "type": {
+                "name": "(a: XmlNode, b: XmlNode) => number"
+              }
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "name": "sort",
+          "description": "Sorts the children of this node. Does not affect children of children.",
+          "arguments": [
+            {
+              "name": "compareFn",
+              "optional": true,
+              "description": "Function to use when sorting children. If not provided, children are sorted alphanumerically by their 'n' attribute.",
+              "type": {
+                "name": "(a: XmlNode, b: XmlNode) => number"
+              }
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "name": "toXml",
+          "description": "Serializes this node and all of its descendants as XML code.",
+          "returnType": {
+            "name": "string"
+          },
+          "arguments": [
+            {
+              "name": "options",
+              "optional": true,
+              "description": "Object containing options.",
+              "type": {
+                "name": "object"
+              },
+              "properties": [
+                {
+                  "name": "indents",
+                  "description": "Number of times to indent this node. This is 0 by default, and increases by 1 for each recursive call.",
+                  "optional": true,
+                  "type": {
+                    "name": "number"
+                  }
+                },
+                {
+                  "name": "spacesPerIndent",
+                  "description": "Number of spaces to use per indent. Default is 2.",
+                  "optional": true,
+                  "type": {
+                    "name": "number"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "type",
+      "name": "XmlValue"
+    },
+    "description": "Values that can be nested in an XmlValueNode.",
+    "sourceCode": "src/xml.ts"
+  },
+  "sections": [
+    {
+      "content": [
+        {
+          "displayType": "general",
+          "paragraphs": [
+            "string | number | bigint | boolean",
+            "Strings will appear as-is. Numbers and bigints will be converted to base-10 strings. Booleans will be written as \"True\" and \"False\" (note the capitalization)."
+          ]
+        }
+      ]
+    }
+  ]
+}
