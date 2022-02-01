@@ -1,0 +1,149 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "imports": [
+    "import { XmlDocumentNode } from \"@s4tk/xml-dom\"; // ESM",
+    "const { XmlDocumentNode } = require(\"@s4tk/xml-dom\"); // CJS"
+  ],
+  "header": {
+    "title": {
+      "prefix": "class",
+      "name": "XmlDocumentNode",
+      "implements": [
+        {
+          "name": "XmlNode",
+          "path": {
+            "pkg": "xml-dom",
+            "group": "interfaces",
+            "item": "XmlNode"
+          }
+        }
+      ]
+    },
+    "description": "A node for an XML document that can have children. Tuning documents should always have one child and one child only, but multiple children are supported.",
+    "sourceCode": "src/xml.ts"
+  },
+  "sections": [
+    {
+      "title": "Intialization",
+      "content": [
+        {
+          "displayType": "function",
+          "name": "constructor",
+          "returnType": {
+            "name": "XmlDocumentNode"
+          },
+          "description": "Creates a new XmlDocumentNode.",
+          "arguments": [
+            {
+              "optional": true,
+              "name": "root",
+              "type": {
+                "name": "XmlNode",
+                "path": {
+                  "pkg": "xml-dom",
+                  "group": "interfaces",
+                  "item": "XmlNode"
+                }
+              },
+              "description": "Node to use as the root of this document."
+            }
+          ],
+          "examples": [
+            {
+              "code": "const root = M({\n  n: \"some.module\",\n  s: fnv64(\"some-module\"),\n  children: [\n    C({\n      name: \"SomeClass\",\n      children: [\n        T({ name: \"NUMBER\", value: 50 }),\n        T({ name: \"BOOLEAN\", value: true })\n      ]\n    })\n  ]\n});\n\nconst doc = new XmlDocumentNode(root);"
+            },
+            {
+              "code": "<!-- Output -->\n<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<M n=\"some.module\" s=\"15948711490371124562\">\n  <C n=\"SomeClass\">\n    <T n=\"NUMBER\">50</T>\n    <T n=\"BOOLEAN\">True</T>\n  </C>\n</M>",
+              "lang": "xml"
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "prefix": "static",
+          "name": "from",
+          "returnType": {
+            "name": "XmlDocumentNode"
+          },
+          "description": "Creates a XmlDocumentNode from XML text.",
+          "arguments": [
+            {
+              "name": "xml",
+              "type": {
+                "name": "string | Buffer"
+              },
+              "description": "XML content to create document from."
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "description": "Object containing optional settings.",
+              "type": {
+                "name": "object"
+              },
+              "properties": [
+                {
+                  "name": "allowMultipleRoots",
+                  "optional": true,
+                  "description": "Whether or not to allow multiple root nodes. If false, an exception is thrown if there is more than one root. False by default.",
+                  "type": {
+                    "name": "boolean"
+                  }
+                },
+                {
+                  "name": "ignoreComments",
+                  "optional": true,
+                  "description": "Whether or not to ignore comments while parsing XML. If true, then comments will be entirely left out. False by default.",
+                  "type": {
+                    "name": "boolean"
+                  }
+                }
+              ]
+            }
+          ],
+          "examples": [
+            {
+              "code": "const xml = `<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<M n=\"some.module\" s=\"15948711490371124562\">\n  <C n=\"SomeClass\">\n    <T n=\"NUMBER\">50</T>\n    <T n=\"BOOLEAN\">True</T>\n  </C>\n</M>`;\n\nconst docFromXml = XmlDocumentNode.from(xml);"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "seeAlso": [
+      {
+        "name": "M",
+        "path": {
+          "pkg": "tunables",
+          "group": "nodes",
+          "item": "M"
+        }
+      },
+      {
+        "name": "C",
+        "path": {
+          "pkg": "tunables",
+          "group": "nodes",
+          "item": "C"
+        }
+      },
+      {
+        "name": "T",
+        "path": {
+          "pkg": "tunables",
+          "group": "nodes",
+          "item": "T"
+        }
+      },
+      {
+        "name": "fnv64",
+        "path": {
+          "pkg": "hashing",
+          "group": "hashing",
+          "item": "fnv64"
+        }
+      }
+    ]
+  }
+}

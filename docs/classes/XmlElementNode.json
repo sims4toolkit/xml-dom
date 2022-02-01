@@ -32,7 +32,7 @@
           "returnType": {
             "name": "XmlElementNode"
           },
-          "description": "Creates a new XmlElementNode",
+          "description": "Creates a new XmlElementNode.",
           "arguments": [
             {
               "optional": true,
@@ -75,7 +75,7 @@
           ],
           "examples": [
             {
-              "code": "const node = XmlElementNode({\n  tag: \"L\",\n  attributes: {\n    \"n\": \"some_list\"\n  },\n  children: [\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(25)\n      ]\n    }),\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(50)\n      ]\n    })\n  ]\n});"
+              "code": "const node = XmlElementNode({\n  tag: \"L\",\n  attributes: {\n    n: \"some_list\"\n  },\n  children: [\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(25)\n      ]\n    }),\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(50)\n      ]\n    })\n  ]\n});"
             },
             {
               "code": "<!-- Output -->\n<L n=\"some_list\">\n  <T>25</T>\n  <T>50</T>\n</L>",
