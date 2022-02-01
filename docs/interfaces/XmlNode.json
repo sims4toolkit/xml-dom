@@ -8,7 +8,7 @@
       "prefix": "interface",
       "name": "XmlNode"
     },
-    "description": "A node in an XML dom.",
+    "description": "A node in an XML document model.",
     "repoUrl": "https://github.com/sims4toolkit/xml-dom/blob/main/src/xml.ts"
   },
   "sections": [
@@ -21,12 +21,7 @@
           "name": "attributes",
           "description": "Object containing the attributes of this node. If this node cannot have attributes, it is undefined.",
           "type": {
-            "name": "Attributes",
-            "path": {
-              "pkg": "xml-dom",
-              "group": "types",
-              "item": "Attributes"
-            }
+            "name": "object"
           }
         },
         {

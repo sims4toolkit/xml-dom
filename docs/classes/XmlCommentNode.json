@@ -1,0 +1,71 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "imports": [
+    "import { XmlCommentNode } from \"@s4tk/xml-dom\"; // ESM",
+    "const { XmlCommentNode } = require(\"@s4tk/xml-dom\"); // CJS"
+  ],
+  "header": {
+    "title": {
+      "prefix": "class",
+      "name": "XmlCommentNode",
+      "implements": [
+        {
+          "name": "XmlNode",
+          "path": {
+            "pkg": "xml-dom",
+            "group": "interfaces",
+            "item": "XmlNode"
+          }
+        }
+      ]
+    },
+    "description": "A node for an XML comment (<!--Like this-->). This node can have a value, and cannot have children.",
+    "repoUrl": "https://github.com/sims4toolkit/xml-dom/blob/main/src/xml.ts"
+  },
+  "sections": [
+    {
+      "title": "Intialization",
+      "content": [
+        {
+          "displayType": "function",
+          "name": "constructor",
+          "returnType": {
+            "name": "XmlCommentNode"
+          },
+          "description": "Creates a new XmlCommentNode",
+          "arguments": [
+            {
+              "optional": true,
+              "name": "value",
+              "type": {
+                "name": "string"
+              },
+              "description": "The string value to put in this comment node."
+            }
+          ],
+          "examples": [
+            {
+              "code": "const node = new XmlCommentNode(\"Something\");"
+            },
+            {
+              "code": "<!-- Output -->\n<!--Something-->",
+              "lang": "xml"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "seeAlso": [
+      {
+        "name": "Comment",
+        "path": {
+          "pkg": "tunables",
+          "group": "nodes",
+          "item": "Comment"
+        }
+      }
+    ]
+  }
+}

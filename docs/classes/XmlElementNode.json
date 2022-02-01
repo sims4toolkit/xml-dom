@@ -1,0 +1,109 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "imports": [
+    "import { XmlElementNode } from \"@s4tk/xml-dom\"; // ESM",
+    "const { XmlElementNode } = require(\"@s4tk/xml-dom\"); // CJS"
+  ],
+  "header": {
+    "title": {
+      "prefix": "class",
+      "name": "XmlElementNode",
+      "implements": [
+        {
+          "name": "XmlNode",
+          "path": {
+            "pkg": "xml-dom",
+            "group": "interfaces",
+            "item": "XmlNode"
+          }
+        }
+      ]
+    },
+    "description": "A node for an XML element that has a tag, attributes, and children.",
+    "repoUrl": "https://github.com/sims4toolkit/xml-dom/blob/main/src/xml.ts"
+  },
+  "sections": [
+    {
+      "title": "Intialization",
+      "content": [
+        {
+          "displayType": "function",
+          "name": "constructor",
+          "returnType": {
+            "name": "XmlElementNode"
+          },
+          "description": "Creates a new XmlElementNode",
+          "arguments": [
+            {
+              "optional": true,
+              "name": "args",
+              "type": {
+                "name": "object"
+              },
+              "description": "Object containing arguments.",
+              "properties": [
+                {
+                  "name": "tag",
+                  "type": {
+                    "name": "string"
+                  },
+                  "description": "String to appear within the tag."
+                },
+                {
+                  "name": "attributes",
+                  "optional": true,
+                  "type": {
+                    "name": "object"
+                  },
+                  "description": "Object containing attributes."
+                },
+                {
+                  "name": "children",
+                  "optional": true,
+                  "type": {
+                    "name": "XmlNode[]",
+                    "path": {
+                      "pkg": "xml-dom",
+                      "group": "interfaces",
+                      "item": "XmlNode"
+                    }
+                  },
+                  "description": "Children to put in this node."
+                }
+              ]
+            }
+          ],
+          "examples": [
+            {
+              "code": "const node = XmlElementNode({\n  tag: \"L\",\n  attributes: {\n    \"n\": \"some_list\"\n  },\n  children: [\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(25)\n      ]\n    }),\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(50)\n      ]\n    })\n  ]\n});"
+            },
+            {
+              "code": "<!-- Output -->\n<L n=\"some_list\">\n  <T>25</T>\n  <T>50</T>\n</L>",
+              "lang": "xml"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "seeAlso": [
+      {
+        "name": "L",
+        "path": {
+          "pkg": "tunables",
+          "group": "nodes",
+          "item": "L"
+        }
+      },
+      {
+        "name": "T",
+        "path": {
+          "pkg": "tunables",
+          "group": "nodes",
+          "item": "T"
+        }
+      }
+    ]
+  }
+}

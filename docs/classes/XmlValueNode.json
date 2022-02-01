@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "imports": [
+    "import { XmlValueNode } from \"@s4tk/xml-dom\"; // ESM",
+    "const { XmlValueNode } = require(\"@s4tk/xml-dom\"); // CJS"
+  ],
+  "header": {
+    "title": {
+      "prefix": "class",
+      "name": "XmlValueNode",
+      "implements": [
+        {
+          "name": "XmlNode",
+          "path": {
+            "pkg": "xml-dom",
+            "group": "interfaces",
+            "item": "XmlNode"
+          }
+        }
+      ]
+    },
+    "description": "A node for a plain XML value (the value itself, not the tag that contains it). This node can have a value, and cannot have children.",
+    "repoUrl": "https://github.com/sims4toolkit/xml-dom/blob/main/src/xml.ts"
+  },
+  "sections": [
+    {
+      "title": "Intialization",
+      "content": [
+        {
+          "displayType": "function",
+          "name": "constructor",
+          "returnType": {
+            "name": "XmlValueNode"
+          },
+          "description": "Creates a new XmlValueNode",
+          "arguments": [
+            {
+              "optional": true,
+              "name": "value",
+              "type": {
+                "name": "XmlValue",
+                "path": {
+                  "pkg": "xml-dom",
+                  "group": "types",
+                  "item": "XmlValue"
+                }
+              },
+              "description": "The value to put in this node."
+            }
+          ],
+          "examples": [
+            {
+              "code": "const boolNode = new XmlValueNode(true); // outputs \"True\"\nconst numNode = new XmlValueNode(50); // outputs \"50\""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
