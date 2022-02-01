@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-index-schema.json",
+  "versions": [
+    "0.1.2"
+  ],
+  "groups": [
+    {
+      "name": "interfaces",
+      "items": [
+        "XmlNode"
+      ]
+    },
+    {
+      "name": "classes",
+      "items": [
+        "XmlCommentNode",
+        "XmlDocumentNode",
+        "XmlElementNode",
+        "XmlValueNode"
+      ]
+    },
+    {
+      "name": "types",
+      "items": [
+        "Attributes",
+        "XmlValue"
+      ]
+    }
+  ]
+}
