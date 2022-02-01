@@ -9,7 +9,7 @@
       "name": "XmlNode"
     },
     "description": "A node in an XML document model.",
-    "repoUrl": "https://github.com/sims4toolkit/xml-dom/blob/main/src/xml.ts"
+    "sourceCode": "src/xml.ts"
   },
   "sections": [
     {

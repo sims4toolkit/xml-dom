@@ -20,7 +20,7 @@
       ]
     },
     "description": "A node for an XML element that has a tag, attributes, and children.",
-    "repoUrl": "https://github.com/sims4toolkit/xml-dom/blob/main/src/xml.ts"
+    "sourceCode": "src/xml.ts"
   },
   "sections": [
     {

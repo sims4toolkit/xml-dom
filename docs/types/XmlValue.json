@@ -6,7 +6,7 @@
       "name": "XmlValue"
     },
     "description": "Values that can be nested in an XmlValueNode.",
-    "repoUrl": "https://github.com/sims4toolkit/xml-dom/blob/main/src/xml.ts"
+    "sourceCode": "src/xml.ts"
   },
   "sections": [
     {

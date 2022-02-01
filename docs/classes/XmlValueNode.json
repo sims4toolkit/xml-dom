@@ -20,7 +20,7 @@
       ]
     },
     "description": "A node for a plain XML value (the value itself, not the tag that contains it). This node can have a value, and cannot have children.",
-    "repoUrl": "https://github.com/sims4toolkit/xml-dom/blob/main/src/xml.ts"
+    "sourceCode": "src/xml.ts"
   },
   "sections": [
     {
