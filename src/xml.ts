@@ -11,6 +11,28 @@ type Attributes = { [key: string]: any; };
 /** Types that may appear in a value node. */
 type XmlValue = number | bigint | boolean | string;
 
+/**
+ * Options to use when writing a node as an XML string.
+ */
+interface XmlFormattingOptions {
+  /**
+   * Whether or not to include the XML processing instruction tag at the top of
+   * this output. Only applicable to document nodes. (Default = true)
+   */
+  includeProcessingInstructions?: boolean;
+
+  /**
+   * Number of times to indent this node. This will increase by 1 for each
+   * recursive call. (Default = 0)
+   */
+  indents?: number;
+
+  /**
+   * Number of spaces to use per indent. (Default = 2)
+   */
+  spacesPerIndent?: number;
+}
+
 //#endregion Types
 
 //#region Models
@@ -158,14 +180,9 @@ export interface XmlNode {
   /**
    * Serializes this node and all of its descendants as XML code.
    * 
-   * Options
-   * - `indents`: Number of times to indent this node. This will increase by 1
-   * for each recursive call. (Default = 0)
-   * - `spacesPerIndent`: Number of spaces to use per indent. (Default = 2)
-   * 
    * @param options Object containing options for serializing
    */
-  toXml(options?: { indents?: number; spacesPerIndent?: number; }): string;
+  toXml(options?: XmlFormattingOptions): string;
 
   //#endregion Methods
 }
@@ -408,12 +425,15 @@ export class XmlDocumentNode extends XmlNodeBase {
     return new XmlDocumentNode(...(this.children.map(child => child.clone())));
   }
 
-  toXml({ indents = 0, spacesPerIndent = 2 }: {
-    indents?: number;
-    spacesPerIndent?: number;
-  } = {}): string {
+  toXml({
+    includeProcessingInstructions = true,
+    indents = 0,
+    spacesPerIndent = 2
+  }: XmlFormattingOptions = {}): string {
     const spaces = " ".repeat(indents * spacesPerIndent);
-    const lines: string[] = [`${spaces}${XML_DECLARATION}`];
+    const lines: string[] = [];
+    if (includeProcessingInstructions)
+      lines.push(`${spaces}${XML_DECLARATION}`);
 
     this.children.forEach(child => {
       lines.push(child.toXml({ indents, spacesPerIndent }));

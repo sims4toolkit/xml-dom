@@ -235,26 +235,13 @@
               "optional": true,
               "description": "Object containing options.",
               "type": {
-                "name": "object"
-              },
-              "properties": [
-                {
-                  "name": "indents",
-                  "description": "Number of times to indent this node. This is 0 by default, and increases by 1 for each recursive call.",
-                  "optional": true,
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "name": "spacesPerIndent",
-                  "description": "Number of spaces to use per indent. Default is 2.",
-                  "optional": true,
-                  "type": {
-                    "name": "number"
-                  }
+                "name": "XmlFormattingOptions",
+                "path": {
+                  "pkg": "xml-dom",
+                  "group": "types",
+                  "item": "XmlFormattingOptions"
                 }
-              ]
+              }
             }
           ]
         }

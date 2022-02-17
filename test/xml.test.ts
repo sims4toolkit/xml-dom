@@ -569,6 +569,21 @@ describe('XmlDocumentNode', function() {
   describe('#toXml()', function() {
     const XML_DECLARATION = '<?xml version="1.0" encoding="utf-8"?>';
 
+    it('should use the XML declaration by default', function () {
+      const node = newNode();
+      expect(node.toXml()).to.equal(XML_DECLARATION);
+    });
+
+    it('should use the XML declaration if given true', function () {
+      const node = newNode();
+      expect(node.toXml({ includeProcessingInstructions: true })).to.equal(XML_DECLARATION);
+    });
+
+    it('should not use the XML declaration if given false', function () {
+      const node = newNode();
+      expect(node.toXml({ includeProcessingInstructions: false })).to.equal("");
+    });
+
     it('should not indent if the given number is 0', function () {
       const node = newNode();
       expect(node.toXml()).to.equal(XML_DECLARATION);

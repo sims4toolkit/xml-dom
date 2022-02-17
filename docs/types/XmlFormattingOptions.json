@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "imports": [
+    "import type { XmlFormattingOptions } from \"@s4tk/xml-dom\"; // TypeScript only"
+  ],
+  "header": {
+    "title": {
+      "prefix": "interface",
+      "name": "XmlFormattingOptions"
+    },
+    "description": "Options to use when writing a node as an XML string.",
+    "sourceCode": "src/xml.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "name": "includeProcessingInstructions",
+          "optional": true,
+          "description": "Whether or not to include the XML processing instruction tag at the top of this output. Only applicable to document nodes. (Default = true)",
+          "type": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "indents",
+          "optional": true,
+          "description": "Number of times to indent this node. This will increase by 1 for each recursive call. (Default = 0)",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "spacesPerIndent",
+          "optional": true,
+          "description": "Number of spaces to use per indent. (Default = 2)",
+          "type": {
+            "name": "number"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "seeAlso": [
+      {
+        "name": "XmlNode",
+        "path": {
+          "pkg": "xml-dom",
+          "group": "interfaces",
+          "item": "XmlNode"
+        }
+      }
+    ]
+  }
+}
