@@ -166,27 +166,100 @@ describe('XmlDocumentNode', function () {
 
     context("has at least one PI tag", () => {
       it("should ignore PI tags if instructed to", () => {
-        // TODO:
+        const xml = `<L>
+          <?ignore
+            <T>FIRST</T>
+            <T>SECOND</T>
+          ?>
+          <T>THIRD</T>
+          <T>FOURTH</T>
+        </L>`;
+
+        const doc = XmlDocumentNode.from(xml, {
+          ignoreProcessingInstructions: true
+        });
+
+        expect(doc.child.numChildren).to.equal(2);
+        expect(doc.child.children[0].innerValue).to.equal("THIRD");
+        expect(doc.child.children[1].innerValue).to.equal("FOURTH");
       });
 
       it("should parse PI tags with attributes only", () => {
-        // TODO:
+        const xml = `<L>
+          <?ignore first="abc" second="def" ?>
+          <T>THIRD</T>
+          <T>FOURTH</T>
+        </L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+
+        expect(doc.child.numChildren).to.equal(3);
+        const wrapper = doc.child.child;
+        expect(wrapper.innerValue).to.equal(`first="abc" second="def"`);
       });
 
       it("should parse PI tags with plain text", () => {
-        // TODO:
+        const xml = `<L>
+          <?ignore this is plain text ?>
+          <T>THIRD</T>
+          <T>FOURTH</T>
+        </L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+
+        expect(doc.child.numChildren).to.equal(3);
+        const wrapper = doc.child.child;
+        expect(wrapper.innerValue).to.equal(`this is plain text`);
       });
 
       it("should parse PI tags with no content", () => {
-        // TODO:
+        const xml = `<L>
+          <?ignore?>
+          <T>THIRD</T>
+          <T>FOURTH</T>
+        </L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+
+        expect(doc.child.numChildren).to.equal(3);
+        const wrapper = doc.child.child;
+        expect(wrapper.numChildren).to.equal(0);
       });
 
       it("should parse PI tags with XML content", () => {
-        // TODO:
+        const xml = `<L>
+          <?ignore
+            <T>FIRST</T>
+            <T>SECOND</T>
+          ?>
+          <T>THIRD</T>
+          <T>FOURTH</T>
+        </L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+
+        expect(doc.child.numChildren).to.equal(3);
+        expect(doc.child.children[1].innerValue).to.equal("THIRD");
+        expect(doc.child.children[2].innerValue).to.equal("FOURTH");
+
+        const wrapped = doc.child.child;
+        expect(wrapped.numChildren).to.equal(2);
+        expect(wrapped.children[0].innerValue).to.equal("FIRST");
+        expect(wrapped.children[1].innerValue).to.equal("SECOND");
       });
 
       it("should parse PI tags with comment", () => {
-        // TODO:
+        const xml = `<L>
+          <?ignore <!--Something--> ?>
+          <T>THIRD</T>
+          <T>FOURTH</T>
+        </L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+
+        expect(doc.child.numChildren).to.equal(3);
+        const wrapper = doc.child.child;
+        expect(wrapper.innerValue).to.equal(`Something`);
       });
 
       it("should parse multiple PI tags of same type", () => {
