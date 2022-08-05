@@ -192,8 +192,8 @@ describe('XmlDocumentNode', function () {
         </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-
         expect(doc.child.numChildren).to.equal(3);
+
         const wrapper = doc.child.child;
         expect(wrapper.innerValue).to.equal(`first="abc" second="def"`);
       });
@@ -206,8 +206,8 @@ describe('XmlDocumentNode', function () {
         </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-
         expect(doc.child.numChildren).to.equal(3);
+
         const wrapper = doc.child.child;
         expect(wrapper.innerValue).to.equal(`this is plain text`);
       });
@@ -220,8 +220,8 @@ describe('XmlDocumentNode', function () {
         </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-
         expect(doc.child.numChildren).to.equal(3);
+
         const wrapper = doc.child.child;
         expect(wrapper.numChildren).to.equal(0);
       });
@@ -237,7 +237,6 @@ describe('XmlDocumentNode', function () {
         </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-
         expect(doc.child.numChildren).to.equal(3);
         expect(doc.child.children[1].innerValue).to.equal("THIRD");
         expect(doc.child.children[2].innerValue).to.equal("FOURTH");
@@ -256,18 +255,38 @@ describe('XmlDocumentNode', function () {
         </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-
         expect(doc.child.numChildren).to.equal(3);
+
         const wrapper = doc.child.child;
         expect(wrapper.innerValue).to.equal(`Something`);
       });
 
       it("should parse multiple PI tags of same type", () => {
-        // TODO:
+        const xml = `<L>
+          <?ignore <T>FIRST</T> ?>
+          <T>SECOND</T>
+          <?ignore <T>THIRD</T> ?>
+          <T>FOURTH</T>
+        </L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.child.children[0].tag).to.equal("ignore");
+        expect(doc.child.children[2].tag).to.equal("ignore");
       });
 
       it("should parse multiple PI tags of different types", () => {
-        // TODO:
+        const xml = `<L>
+          <?ignore <T>FIRST</T> ?>
+          <T>SECOND</T>
+          <?something_random <T>THIRD</T> ?>
+          <T>FOURTH</T>
+        </L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.child.children[0].tag).to.equal("ignore");
+        expect(doc.child.children[2].tag).to.equal("something_random");
       });
 
       it("should ignore opening PI tag that is in a comment", () => {
