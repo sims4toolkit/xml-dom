@@ -268,7 +268,7 @@ abstract class XmlNodeBase implements XmlNode {
 
   set innerValue(value: XmlValue) {
     this._ensureChildren();
-    if (this.numChildren === 0) { 
+    if (this.numChildren === 0) {
       this.addChildren(new XmlValueNode(value));
     } else {
       this.child.value = value; // might throw, that's OK
@@ -344,8 +344,8 @@ abstract class XmlNodeBase implements XmlNode {
 
   abstract toXml(options?: {
     indents?: number;
-    spacesPerIndent?: number;}
-    ): string;
+    spacesPerIndent?: number;
+  }): string;
 
   //#endregion Methods
 
@@ -393,12 +393,14 @@ export class XmlDocumentNode extends XmlNodeBase {
    */
   static from(xml: string | Buffer, {
     allowMultipleRoots = false,
-    ignoreComments = false
+    ignoreComments = false,
+    ignoreProcessingInstructions = false,
   }: {
     allowMultipleRoots?: boolean;
     ignoreComments?: boolean;
+    ignoreProcessingInstructions?: boolean;
   } = {}): XmlDocumentNode {
-    const nodes = parseXml(xml, !ignoreComments);
+    const nodes = parseXml(xml, !ignoreComments, !ignoreProcessingInstructions);
     if (nodes.length <= 1) return new XmlDocumentNode(nodes[0]);
     if (allowMultipleRoots) {
       const doc = new XmlDocumentNode();
@@ -490,7 +492,7 @@ export class XmlElementNode extends XmlNodeBase {
       });
     }
     const attrString = attrNodes.join(' ');
-    
+
     // tags & children
     if (this.numChildren === 0) {
       lines.push(`${spaces}<${this.tag}${attrString}/>`);
@@ -554,9 +556,67 @@ export class XmlCommentNode extends XmlNodeBase {
   }
 }
 
+/** A processing instruction node that contains other XML. */
+export class XmlWrappingNode extends XmlNodeBase {
+  /**
+   * Creates a new XmlWrappingNode with the given tag and children. If this is a
+   * PI tag with attributes rather than actual nodes, the attributes should be
+   * plain text in a value node. Note that the tag should NOT include the "?",
+   * as it will be appended when the node is serialized.
+   * 
+   * Arguments:
+   * - `tag`: Required. The tag to use for this node (do NOT include "?").
+   * - `children`: An array for the children of this node. (Default = [])
+   * 
+   * @param args Arguments for construction 
+   */
+  constructor({ tag, children = [] }: {
+    tag: string;
+    children?: XmlNode[];
+  }) {
+    if (!tag) throw new Error("Element tag must be a non-empty string.");
+    super({ tag, children });
+  }
+
+  clone(): XmlWrappingNode {
+    return new XmlWrappingNode({
+      tag: this.tag,
+      children: this.children.map(child => child.clone())
+    });
+  }
+
+  toXml({ indents = 0, spacesPerIndent = 2 }: {
+    indents?: number;
+    spacesPerIndent?: number;
+  } = {}): string {
+    const spaces = " ".repeat(indents * spacesPerIndent);
+    const lines: string[] = [];
+
+    // tags & children
+    if (this.numChildren === 0) {
+      lines.push(`${spaces}<?${this.tag}?>`);
+    } else if (this.numChildren <= 2 && !this.child.hasChildren) {
+      const value = this.children.map(child => child.toXml()).join('');
+      lines.push(`${spaces}<?${this.tag} ${value} ?>`);
+    } else {
+      lines.push(`${spaces}<?${this.tag}`);
+      this.children.forEach(child => {
+        lines.push(child.toXml({ indents: indents + 1, spacesPerIndent }));
+      });
+      lines.push(`${spaces}?>`);
+    }
+
+    return lines.join('\n');
+  }
+}
+
 //#endregion Models
 
 //#region Helpers
+
+const PI_NODE_TAG = "__PI_NODE";
+
+class UnescapedProcessingInstructionsError extends Error { }
 
 /**
  * Formats a value that may appear in XML as a string.
@@ -579,10 +639,17 @@ function formatValue(value: number | bigint | boolean | string): string {
  * Parses a string or buffer containing XML as a list of nodes.
  * 
  * @param xml XML document to parse as a node
+ * @param parseComments Whether or not to parse comment nodes
+ * @param parsePiTags Whether or not to parse PI nodes
  */
-function parseXml(xml: string | Buffer, parseComments = true): XmlNode[] {
+function parseXml(
+  xml: string | Buffer,
+  parseComments: boolean,
+  parsePiTags: boolean,
+): XmlNode[] {
   try {
     const options: Partial<X2jOptions> = {
+      ignoreDeclaration: true,
       ignoreAttributes: false,
       attributeNamePrefix: "",
       parseAttributeValue: false,
@@ -608,38 +675,74 @@ function parseXml(xml: string | Buffer, parseComments = true): XmlNode[] {
         return new XmlCommentNode(nodeObj.comment[0].value);
       } else if (nodeObj.value) {
         return new XmlValueNode(nodeObj.value);
-      } else if (nodeObj['?xml']) {
-        // HACK: temporary solution while declaration is parsed
-        return undefined;
       } else {
         let tag: string;
         let children: XmlNode[];
         let attributes: Attributes = {};
+        let isWrapper = false;
+
         for (const key in nodeObj) {
           if (key === ":@") {
             Object.assign(attributes, nodeObj[key]);
-          } else {
-            // guaranteed to execute once and only once
+          } else if (key === PI_NODE_TAG) {
+            isWrapper = true;
+            children = parseNodeObjArray(nodeObj[key]);
+          } else if (key.startsWith("?")) {
+            if (!parsePiTags) return undefined;
+            throw new UnescapedProcessingInstructionsError();
+          } else { // guaranteed to execute once and only once
             tag = key;
-            children = nodeObj[key].map(parseNodeObj);
+            children = parseNodeObjArray(nodeObj[key]);
           }
         }
-        return new XmlElementNode({ tag, children, attributes });
+
+        return isWrapper
+          ? new XmlWrappingNode({ tag: attributes.tag, children })
+          : new XmlElementNode({ tag, children, attributes });
       }
     }
 
-    // TODO: use below line instead when declaration can be skipped
-    // return nodeObjs.map(parseNodeObj);
+    function parseNodeObjArray(nodeObjArr: NodeObj[]): XmlNode[] {
+      return nodeObjArr.map(parseNodeObj).filter((n: any) => n);
+    }
 
-    const nodes: XmlNode[] = [];
-    nodeObjs.forEach(nodeObj => {
-      const node = parseNodeObj(nodeObj);
-      if (node) nodes.push(node);
-    });
-    return nodes;
+    try {
+      return parseNodeObjArray(nodeObjs);
+    } catch (e) {
+      if (e instanceof UnescapedProcessingInstructionsError) {
+        return parseXml(
+          replaceProcessingInstructions(xml),
+          parseComments,
+          false
+        );
+      } else {
+        throw e;
+      }
+    }
   } catch (e) {
     throw new Error(`Could not parse XML as DOM: ${e}`);
   }
+}
+
+/**
+ * Transforms all PI tags in the given XML string/Buffer to special element tags
+ * that can be parsed as regular nodes.
+ * 
+ * @param xml XML content to replace all PI tags in
+ */
+function replaceProcessingInstructions(xml: string | Buffer): string {
+  const piSpanRegex = /<\?\s*[^(xml)](?:(?!\?>).)*\?>/gis;
+  const piOpenTagRegex = /^<\?\s*\S*/;
+  const piCloseTagRegex = /\?>$/;
+  const xmlString = (typeof xml === "string" ? xml : xml.toString());
+  return xmlString.replace(piSpanRegex, (prev) => {
+    const openTagResult = piOpenTagRegex.exec(prev);
+    const tag = openTagResult![0].replace("<?", "").trim();
+    const innerContent = prev
+      .replace(piOpenTagRegex, "")
+      .replace(piCloseTagRegex, "");
+    return `<${PI_NODE_TAG} tag="${tag}">${innerContent}</${PI_NODE_TAG}>`;
+  });
 }
 
 //#endregion Helpers
