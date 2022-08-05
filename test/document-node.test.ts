@@ -140,11 +140,19 @@ describe('XmlDocumentNode', function () {
         // TODO:
       });
 
+      it("should ignore complete PI tag that is in a comment", () => {
+        // TODO:
+      });
+
       it("should ignore opening PI tag that is in a string", () => {
         // TODO:
       });
 
       it("should ignore closing PI tag that is in a string", () => {
+        // TODO:
+      });
+
+      it("should ignore complete PI tag that is in a string", () => {
         // TODO:
       });
     });
@@ -190,11 +198,43 @@ describe('XmlDocumentNode', function () {
         // TODO:
       });
 
+      it("should ignore complete PI tag that is in a comment", () => {
+        // TODO:
+      });
+
+      it("should ignore opening PI tag that is in a nested comment", () => {
+        // TODO:
+      });
+
+      it("should ignore closing PI tag that is in a nested comment", () => {
+        // TODO:
+      });
+
+      it("should ignore complete PI tag that is in a nested comment", () => {
+        // TODO:
+      });
+
       it("should ignore opening PI tag that is in a string", () => {
         // TODO:
       });
 
       it("should ignore closing PI tag that is in a string", () => {
+        // TODO:
+      });
+
+      it("should ignore complete PI tag that is in a string", () => {
+        // TODO:
+      });
+
+      it("should ignore opening PI tag that is in a nested string", () => {
+        // TODO:
+      });
+
+      it("should ignore closing PI tag that is in a nested string", () => {
+        // TODO:
+      });
+
+      it("should ignore complete PI tag that is in a nested string", () => {
         // TODO:
       });
     });
