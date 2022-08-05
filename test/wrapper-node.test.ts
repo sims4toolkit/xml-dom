@@ -404,7 +404,93 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#toXml()", () => {
-    // TODO:
+    it("should not indent by default", () => {
+      const node = newNode();
+      expect(node.toXml()).to.equal(`<?ignore?>`);
+    });
+
+    it("should use 2 spaces by default", () => {
+      const node = newNode();
+      expect(node.toXml({ indents: 1 })).to.equal(`  <?ignore?>`);
+    });
+
+    it("should use the given number of spaces", () => {
+      const node = newNode();
+      expect(node.toXml({
+        indents: 1,
+        spacesPerIndent: 4
+      })).to.equal(`    <?ignore?>`);
+    });
+
+    it("should be on one line if there is one value child", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlValueNode(50)
+        ]
+      });
+
+      expect(node.toXml()).to.equal(`<?ignore 50 ?>`);
+    });
+
+    it("should be on one line if there are two value/comment children", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlValueNode(50),
+          new XmlCommentNode("hi")
+        ]
+      });
+
+      expect(node.toXml()).to.equal(`<?ignore 50<!--hi--> ?>`);
+    });
+
+    it("should put an element child on its own line, indented", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode(50),
+              new XmlCommentNode("hi")
+            ]
+          })
+        ]
+      });
+
+      expect(node.toXml()).to.equal(`<?ignore\n  <T>50<!--hi--></T>\n?>`);
+    });
+
+    it("should increase indentation by 1 for each recursive call", () => {
+      const node = new XmlWrapperNode({
+        tag: "something",
+        children: [
+          new XmlElementNode({
+            tag: "U",
+            children: [
+              new XmlElementNode({
+                tag: "T",
+                attributes: { n: "first" },
+                children: [new XmlValueNode(123)]
+              }),
+              new XmlElementNode({
+                tag: 'T',
+                attributes: { n: "second" },
+                children: [new XmlValueNode(456)]
+              })
+            ]
+          })
+        ]
+      });
+
+      expect(node.toXml()).to.equal(`<?something
+  <U>
+    <T n="first">123</T>
+    <T n="second">456</T>
+  </U>
+?>`);
+    });
   });
 
   //#endregion Methods
