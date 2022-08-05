@@ -170,6 +170,10 @@ describe('XmlDocumentNode', function () {
         // TODO:
       });
 
+      it("should parse PI tags with comment", () => {
+        // TODO:
+      });
+
       it("should parse multiple PI tags of same type", () => {
         // TODO:
       });
