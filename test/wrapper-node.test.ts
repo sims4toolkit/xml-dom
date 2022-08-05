@@ -1,6 +1,5 @@
 import { expect } from "chai";
-import { XmlCommentNode, XmlElementNode, XmlNode, XmlValueNode } from "../dst/xml";
-import { XmlWrapperNode } from "../dst/xml";
+import { XmlCommentNode, XmlElementNode, XmlValueNode, XmlWrapperNode } from "../dst/xml";
 
 describe("XmlWrapperNode", () => {
   const newNode = (tag = "ignore") => new XmlWrapperNode({ tag });
@@ -130,7 +129,53 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#innerValue", () => {
-    // TODO:
+    it("should be undefined if there are no children", () => {
+      const node = newNode();
+      expect(node.innerValue).to.be.undefined;
+    });
+
+    it("should be undefined if the first child is an element", () => {
+      const node = newNode("L");
+      node.addChildren(new XmlElementNode({ tag: "T" }));
+      expect(node.innerValue).to.be.undefined;
+    });
+
+    it("should be the value of the first child if it is a value node", () => {
+      const node = newNode();
+      node.addChildren(new XmlValueNode(123n));
+      expect(node.innerValue).to.equal(123n);
+    });
+
+    it("should be the value of the text of the first child if it is a comment", () => {
+      const node = newNode();
+      node.child = new XmlCommentNode("This is a comment.");
+      expect(node.innerValue).to.equal("This is a comment.");
+    });
+
+    it("should throw when setting if the first child cannot have a value", () => {
+      const node = newNode();
+      node.addChildren(new XmlElementNode({ tag: "T" }));
+      expect(() => node.innerValue = 123n).to.throw();
+    });
+
+    it("should set the value of the first child if it can have a value", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [new XmlValueNode(123)]
+      });
+
+      expect(node.child.value).to.equal(123);
+      node.innerValue = 456;
+      expect(node.child.value).to.equal(456);
+    });
+
+    it("should create a new value node child if there are no children", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      node.innerValue = 123n;
+      expect(node.numChildren).to.equal(1);
+      expect(node.child.value).to.equal(123n);
+    });
   });
 
   describe("#name", () => {
@@ -146,7 +191,25 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#numChildren", () => {
-    // TODO:
+    it("should return 0 if there are no children", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+    });
+
+    it("should return number of children if there are any", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlCommentNode("first"),
+          new XmlCommentNode("second"),
+          new XmlCommentNode("third")
+        ]
+      });
+
+      expect(node.numChildren).to.equal(3);
+      node.addChildren(new XmlCommentNode("fourth"));
+      expect(node.numChildren).to.equal(4);
+    });
   });
 
   describe("#tag", () => {
@@ -190,13 +253,72 @@ describe("XmlWrapperNode", () => {
 
   //#region Methods
 
-
   describe("#addChildren()", () => {
-    // TODO:
+    it("should do nothing when no children are given", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      node.addChildren();
+      expect(node.numChildren).to.equal(0);
+    });
+
+    it("should add the one child that is given", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      node.addChildren(new XmlValueNode("hi"));
+      expect(node.numChildren).to.equal(1);
+      expect(node.children[0].value).to.equal("hi");
+    });
+
+    it("should add all children that are given", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      node.addChildren(new XmlValueNode("hi"), new XmlValueNode("bye"));
+      expect(node.numChildren).to.equal(2);
+      expect(node.children[0].value).to.equal("hi");
+      expect(node.children[1].value).to.equal("bye");
+    });
+
+    it("should mutate the original children", () => {
+      const node = newNode();
+      const child = new XmlValueNode(123n);
+      node.addChildren(child);
+      node.innerValue = 456n;
+      expect(child.value).to.equal(456n);
+    });
   });
 
   describe("#addClones()", () => {
-    // TODO:
+    it("should do nothing when no children are given", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      node.addClones();
+      expect(node.numChildren).to.equal(0);
+    });
+
+    it("should add the one child that is given", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      node.addClones(new XmlValueNode("hi"));
+      expect(node.numChildren).to.equal(1);
+      expect(node.children[0].value).to.equal("hi");
+    });
+
+    it("should add all children that are given", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      node.addClones(new XmlValueNode("hi"), new XmlValueNode("bye"));
+      expect(node.numChildren).to.equal(2);
+      expect(node.children[0].value).to.equal("hi");
+      expect(node.children[1].value).to.equal("bye");
+    });
+
+    it("should not mutate the original children", () => {
+      const node = newNode();
+      const child = new XmlValueNode(123n);
+      node.addClones(child);
+      node.innerValue = 456n;
+      expect(child.value).to.equal(123n);
+    });
   });
 
   describe("#clone()", () => {
