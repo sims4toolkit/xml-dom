@@ -291,15 +291,16 @@ describe('XmlDocumentNode', function () {
 
       it("should ignore opening PI tag that is in a comment", () => {
         const xml = `<L>
-  <?ignore <T>FIRST</T> ?>
+  <?ignore
+    <T>FIRST</T>
+  ?>
   <T>SECOND</T>
-  <T>THIRD</T>
-  <!-- Something <? -->
-  <T>FOURTH</T>
+  <!-- <?ignore -->
 </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(5);
+        expect(doc.child.numChildren).to.equal(3);
+        expect(doc.child.child.numChildren).to.equal(1);
         expect(doc.toXml()).to.equal(xml);
       });
 
@@ -307,43 +308,42 @@ describe('XmlDocumentNode', function () {
         const xml = `<L>
   <?ignore
     <T>FIRST</T>
-    <!-- Something <? -->
+    <!-- <?ignore -->
   ?>
   <T>SECOND</T>
-  <T>THIRD</T>
-  <T>FOURTH</T>
 </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.child.numChildren).to.equal(2);
+        expect(doc.child.child.numChildren).to.equal(2);
         expect(doc.toXml()).to.equal(xml);
       });
 
       it("should ignore opening PI tag that is in a string", () => {
         const xml = `<L>
-  <?ignore <T>FIRST</T> ?>
-  <T>SECOND</T>
-  <T n="something<?">THIRD</T>
-  <T>FOURTH</T>
+  <?ignore
+    <T>FIRST</T>
+  ?>
+  <T n="<?ignore">SECOND</T>
 </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.child.numChildren).to.equal(2);
+        expect(doc.child.child.numChildren).to.equal(1);
         expect(doc.toXml()).to.equal(xml);
       });
 
       it("should ignore opening PI tag that is in a nested string", () => {
         const xml = `<L>
   <?ignore
-    <T n="<? Something">FIRST</T>
+    <T n="<?ignore">FIRST</T>
   ?>
   <T>SECOND</T>
-  <T>THIRD</T>
-  <T>FOURTH</T>
 </L>`;
 
         const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.child.numChildren).to.equal(2);
+        expect(doc.child.child.numChildren).to.equal(1);
         expect(doc.toXml()).to.equal(xml);
       });
     });
