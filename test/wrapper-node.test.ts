@@ -8,23 +8,33 @@ describe("XmlWrapperNode", () => {
 
   describe("#constructor", () => {
     it("should throw when no tag given", () => {
-      // TODO:
-    });
-
-    it("should throw when empty tag given", () => {
-      // TODO:
+      expect(() => new XmlWrapperNode({ tag: "" })).to.throw();
     });
 
     it("should have an empty array of children if none provided", () => {
-      // TODO:
-    });
-
-    it("should create a new node with just a tag", () => {
-      // TODO:
+      const node = new XmlWrapperNode({ tag: "ignore" });
+      expect(node.children).to.be.an("Array").that.is.empty;
     });
 
     it("should create a new node with the given tag and children", () => {
-      // TODO:
+      const child = new XmlElementNode({
+        tag: "T",
+        children: [
+          new XmlValueNode(50),
+          new XmlCommentNode("comment")
+        ]
+      });
+
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          child
+        ]
+      });
+
+      expect(node.tag).to.equal("ignore");
+      expect(node.children).to.be.an("Array").with.lengthOf(1);
+      expect(node.child).to.equal(child);
     });
   });
 
