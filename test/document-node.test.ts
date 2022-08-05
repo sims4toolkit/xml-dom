@@ -303,71 +303,11 @@ describe('XmlDocumentNode', function () {
         expect(doc.toXml()).to.equal(xml);
       });
 
-      it("should ignore closing PI tag that is in a comment", () => {
-        const xml = `<L>
-  <?ignore <T>FIRST</T> ?>
-  <T>SECOND</T>
-  <T>THIRD</T>
-  <!-- Something ?> -->
-  <T>FOURTH</T>
-</L>`;
-
-        const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(5);
-        expect(doc.toXml()).to.equal(xml);
-      });
-
-      it("should ignore complete PI tag that is in a comment", () => {
-        const xml = `<L>
-  <?ignore <T>FIRST</T> ?>
-  <T>SECOND</T>
-  <T>THIRD</T>
-  <!-- <?ignore Something ?> -->
-  <T>FOURTH</T>
-</L>`;
-
-        const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(5);
-        expect(doc.toXml()).to.equal(xml);
-      });
-
       it("should ignore opening PI tag that is in a nested comment", () => {
         const xml = `<L>
   <?ignore
     <T>FIRST</T>
     <!-- Something <? -->
-  ?>
-  <T>SECOND</T>
-  <T>THIRD</T>
-  <T>FOURTH</T>
-</L>`;
-
-        const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
-        expect(doc.toXml()).to.equal(xml);
-      });
-
-      it("should ignore closing PI tag that is in a nested comment", () => {
-        const xml = `<L>
-  <?ignore
-    <T>FIRST</T>
-    <!-- Something ?> -->
-  ?>
-  <T>SECOND</T>
-  <T>THIRD</T>
-  <T>FOURTH</T>
-</L>`;
-
-        const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
-        expect(doc.toXml()).to.equal(xml);
-      });
-
-      it("should ignore complete PI tag that is in a nested comment", () => {
-        const xml = `<L>
-  <?ignore
-    <T>FIRST</T>
-    <!-- <?ignore Something ?> -->
   ?>
   <T>SECOND</T>
   <T>THIRD</T>
@@ -392,66 +332,10 @@ describe('XmlDocumentNode', function () {
         expect(doc.toXml()).to.equal(xml);
       });
 
-      it("should ignore closing PI tag that is in a string", () => {
-        const xml = `<L>
-  <?ignore <T>FIRST</T> ?>
-  <T>SECOND</T>
-  <T n="something?>">THIRD</T>
-  <T>FOURTH</T>
-</L>`;
-
-        const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
-        expect(doc.toXml()).to.equal(xml);
-      });
-
-      it("should ignore complete PI tag that is in a string", () => {
-        const xml = `<L>
-  <?ignore <T>FIRST</T> ?>
-  <T>SECOND</T>
-  <T n="<?ignore something ?>">THIRD</T>
-  <T>FOURTH</T>
-</L>`;
-
-        const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
-        expect(doc.toXml()).to.equal(xml);
-      });
-
       it("should ignore opening PI tag that is in a nested string", () => {
         const xml = `<L>
   <?ignore
     <T n="<? Something">FIRST</T>
-  ?>
-  <T>SECOND</T>
-  <T>THIRD</T>
-  <T>FOURTH</T>
-</L>`;
-
-        const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
-        expect(doc.toXml()).to.equal(xml);
-      });
-
-      it("should ignore closing PI tag that is in a nested string", () => {
-        const xml = `<L>
-  <?ignore
-    <T n="Something ?>">FIRST</T>
-  ?>
-  <T>SECOND</T>
-  <T>THIRD</T>
-  <T>FOURTH</T>
-</L>`;
-
-        const doc = XmlDocumentNode.from(xml);
-        expect(doc.child.numChildren).to.equal(4);
-        expect(doc.toXml()).to.equal(xml);
-      });
-
-      it("should ignore complete PI tag that is in a nested string", () => {
-        const xml = `<L>
-  <?ignore
-    <T n="<?ignore Something ?>">FIRST</T>
   ?>
   <T>SECOND</T>
   <T>THIRD</T>
