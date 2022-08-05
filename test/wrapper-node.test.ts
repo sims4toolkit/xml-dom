@@ -150,7 +150,16 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#tag", () => {
-    // TODO:
+    it("should be the tag of this node", () => {
+      const node = new XmlWrapperNode({ tag: "ignore" });
+      expect(node.tag).to.equal("ignore");
+    });
+
+    it("should set the tag of this node", () => {
+      const node = new XmlWrapperNode({ tag: "ignore" });
+      node.tag = "something_else"
+      expect(node.tag).to.equal("something_else");
+    });
   });
 
   describe("#type", () => {
