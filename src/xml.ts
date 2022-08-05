@@ -731,6 +731,7 @@ function parseXml(
  * @param xml XML content to replace all PI tags in
  */
 function replaceProcessingInstructions(xml: string | Buffer): string {
+  // FIXME: Known bug when "<?" or "?>" appears in a comment or string
   const piSpanRegex = /<\?\s*[^(xml)](?:(?!\?>).)*\?>/gis;
   const piOpenTagRegex = /^<\?\s*\S*/;
   const piCloseTagRegex = /\?>$/;

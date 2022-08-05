@@ -1,12 +1,32 @@
 import { expect } from "chai";
-import type { XmlNode } from "../dst/xml";
-import { XmlDocumentNode, XmlElementNode, XmlValueNode, XmlCommentNode } from "../dst/xml";
+import { XmlNode, XmlValueNode } from "../dst/xml";
+import { XmlWrapperNode } from "../dst/xml";
 
 describe("XmlWrapperNode", () => {
+  const newNode = (tag = "ignore") => new XmlWrapperNode({ tag });
+
   //#region Initialization
 
   describe("#constructor", () => {
-    // TODO:
+    it("should throw when no tag given", () => {
+      // TODO:
+    });
+
+    it("should throw when empty tag given", () => {
+      // TODO:
+    });
+
+    it("should have an empty array of children if none provided", () => {
+      // TODO:
+    });
+
+    it("should create a new node with just a tag", () => {
+      // TODO:
+    });
+
+    it("should create a new node with the given tag and children", () => {
+      // TODO:
+    });
   });
 
   //#endregion Initialization
@@ -14,23 +34,99 @@ describe("XmlWrapperNode", () => {
   //#region Properties
 
   describe("#attributes", () => {
-    // TODO:
+    it("should not be assignable", () => {
+      const node = newNode();
+      //@ts-expect-error
+      expect(() => node.attributes = {}).to.throw();
+    });
+
+    it("should be undefined", () => {
+      const node = newNode();
+      expect(node.attributes).to.be.undefined;
+    });
   });
 
   describe("#child", () => {
-    // TODO:
+    it("should be undefined if there are no children", () => {
+      const node = newNode();
+      expect(node.child).to.be.undefined;
+    });
+
+    it("should be the same as the first child", () => {
+      const node = newNode();
+      node.addChildren(new XmlValueNode("hello"));
+      expect(node.child.value).to.equal("hello");
+    });
+
+    it("should update the first child when set", () => {
+      const node = newNode();
+      node.addChildren(new XmlValueNode("hello"));
+      expect(node.child.value).to.equal("hello");
+      node.child = new XmlValueNode("new text");
+      expect(node.child.value).to.equal("new text");
+    });
+
+    it("should add a child if there are none", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      node.child = new XmlValueNode("new text");
+      expect(node.numChildren).to.equal(1);
+      expect(node.child.value).to.equal("new text");
+    });
   });
 
   describe("#children", () => {
-    // TODO:
+    it("should throw when trying to set", () => {
+      const node = newNode();
+      //@ts-expect-error
+      expect(() => node.children = [newNode()]).to.throw();
+    });
+
+    it("should be an empty array if there are no children", () => {
+      const node = newNode();
+      expect(node.children).to.be.an("Array").that.is.empty;
+    });
+
+    it("should contain all of this node's children", () => {
+      const node = newNode();
+      node.addChildren(new XmlValueNode(1), new XmlValueNode(2));
+      expect(node.children.length).to.equal(2);
+      expect(node.children[0].value).to.equal(1);
+      expect(node.children[1].value).to.equal(2);
+    });
   });
 
   describe("#hasChildren", () => {
-    // TODO:
+    it("should not be assignable", () => {
+      const node = newNode();
+      //@ts-expect-error
+      expect(() => node.children = [newNode()]).to.throw();
+    });
+
+    it("should return true when it has children", () => {
+      const node = newNode();
+      node.addChildren(newNode());
+      expect(node.hasChildren).to.be.true;
+    });
+
+    it("should return true when it does not have children", () => {
+      // this test is not a typo, the hasChildren getter returns if there is
+      // a children ARRAY -- it does not have to have any items in it
+      const node = newNode();
+      expect(node.hasChildren).to.be.true;
+    });
   });
 
   describe("#id", () => {
-    // TODO:
+    it("should throw when trying to set", () => {
+      const node = newNode();
+      expect(() => node.id = 123n).to.throw();
+    });
+
+    it("should be undefined", () => {
+      const node = newNode();
+      expect(node.id).to.be.undefined;
+    });
   });
 
   describe("#innerValue", () => {
@@ -38,7 +134,15 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#name", () => {
-    // TODO:
+    it("should throw when trying to set", () => {
+      const node = newNode();
+      expect(() => node.name = "name").to.throw();
+    });
+
+    it("should be undefined", () => {
+      const node = newNode();
+      expect(node.name).to.be.undefined;
+    });
   });
 
   describe("#numChildren", () => {
