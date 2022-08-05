@@ -557,7 +557,7 @@ export class XmlCommentNode extends XmlNodeBase {
 }
 
 /** A processing instruction node that contains other XML. */
-export class XmlWrappingNode extends XmlNodeBase {
+export class XmlWrapperNode extends XmlNodeBase {
   /**
    * Creates a new XmlWrappingNode with the given tag and children. If this is a
    * PI tag with attributes rather than actual nodes, the attributes should be
@@ -578,8 +578,8 @@ export class XmlWrappingNode extends XmlNodeBase {
     super({ tag, children });
   }
 
-  clone(): XmlWrappingNode {
-    return new XmlWrappingNode({
+  clone(): XmlWrapperNode {
+    return new XmlWrapperNode({
       tag: this.tag,
       children: this.children.map(child => child.clone())
     });
@@ -697,7 +697,7 @@ function parseXml(
         }
 
         return isWrapper
-          ? new XmlWrappingNode({ tag: attributes.tag, children })
+          ? new XmlWrapperNode({ tag: attributes.tag, children })
           : new XmlElementNode({ tag, children, attributes });
       }
     }
