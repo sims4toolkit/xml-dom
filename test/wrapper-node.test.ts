@@ -204,7 +204,42 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#deepSort()", () => {
-    // TODO:
+    it("should sort childrens' children", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({
+            tag: "L",
+            attributes: { n: "list_b" },
+            children: [
+              new XmlElementNode({ tag: "T", attributes: { n: "b" } }),
+              new XmlElementNode({ tag: "T", attributes: { n: "a" } }),
+              new XmlElementNode({ tag: "T", attributes: { n: "c" } })
+            ]
+          }),
+          new XmlElementNode({
+            tag: "L",
+            attributes: { n: "list_a" },
+            children: [
+              new XmlElementNode({ tag: "T", attributes: { n: "b" } }),
+              new XmlElementNode({ tag: "T", attributes: { n: "a" } }),
+              new XmlElementNode({ tag: "T", attributes: { n: "c" } })
+            ]
+          })
+        ]
+      });
+
+      node.deepSort();
+      const [first, second] = node.children;
+      expect(first.name).to.equal("list_a");
+      expect(first.children[0].name).to.equal("a");
+      expect(first.children[1].name).to.equal("b");
+      expect(first.children[2].name).to.equal("c");
+      expect(second.name).to.equal("list_b");
+      expect(second.children[0].name).to.equal("a");
+      expect(second.children[1].name).to.equal("b");
+      expect(second.children[2].name).to.equal("c");
+    });
   });
 
   describe("#findChild()", () => {
@@ -251,18 +286,18 @@ describe("XmlWrapperNode", () => {
       const node = new XmlWrapperNode({
         tag: "ignore",
         children: [
-          new XmlElementNode({ tag: 'T', attributes: { n: "c" } }),
-          new XmlElementNode({ tag: 'T', attributes: { n: "a" } }),
-          new XmlElementNode({ tag: 'T', attributes: { n: "d" } }),
-          new XmlElementNode({ tag: 'T', attributes: { n: "b" } })
+          new XmlElementNode({ tag: "T", attributes: { n: "c" } }),
+          new XmlElementNode({ tag: "T", attributes: { n: "a" } }),
+          new XmlElementNode({ tag: "T", attributes: { n: "d" } }),
+          new XmlElementNode({ tag: "T", attributes: { n: "b" } })
         ]
       });
 
       node.sort();
-      expect(node.children[0].name).to.equal('a');
-      expect(node.children[1].name).to.equal('b');
-      expect(node.children[2].name).to.equal('c');
-      expect(node.children[3].name).to.equal('d');
+      expect(node.children[0].name).to.equal("a");
+      expect(node.children[1].name).to.equal("b");
+      expect(node.children[2].name).to.equal("c");
+      expect(node.children[3].name).to.equal("d");
     });
 
     it("should sort children according to the given function", () => {
@@ -270,17 +305,17 @@ describe("XmlWrapperNode", () => {
         tag: "ignore",
         children: [
           new XmlElementNode({
-            tag: 'T',
+            tag: "T",
             attributes: { n: "ten" },
             children: [new XmlValueNode(10)]
           }),
           new XmlElementNode({
-            tag: 'T',
+            tag: "T",
             attributes: { n: "one" },
             children: [new XmlValueNode(1)]
           }),
           new XmlElementNode({
-            tag: 'T',
+            tag: "T",
             attributes: { n: "five" },
             children: [new XmlValueNode(5)]
           })
@@ -288,9 +323,9 @@ describe("XmlWrapperNode", () => {
       });
 
       node.sort((a, b) => (a.innerValue as number) - (b.innerValue as number));
-      expect(node.children[0].name).to.equal('one');
-      expect(node.children[1].name).to.equal('five');
-      expect(node.children[2].name).to.equal('ten');
+      expect(node.children[0].name).to.equal("one");
+      expect(node.children[1].name).to.equal("five");
+      expect(node.children[2].name).to.equal("ten");
     });
 
     it("should not change the order of childrens' children", () => {
@@ -298,12 +333,12 @@ describe("XmlWrapperNode", () => {
         tag: "ignore",
         children: [
           new XmlElementNode({
-            tag: 'L',
+            tag: "L",
             attributes: { n: "list" },
             children: [
-              new XmlElementNode({ tag: 'T', attributes: { n: "b" } }),
-              new XmlElementNode({ tag: 'T', attributes: { n: "a" } }),
-              new XmlElementNode({ tag: 'T', attributes: { n: "c" } })
+              new XmlElementNode({ tag: "T", attributes: { n: "b" } }),
+              new XmlElementNode({ tag: "T", attributes: { n: "a" } }),
+              new XmlElementNode({ tag: "T", attributes: { n: "c" } })
             ]
           })
         ]
