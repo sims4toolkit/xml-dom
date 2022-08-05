@@ -132,28 +132,35 @@ describe('XmlDocumentNode', function () {
     });
 
     context("has no PI tags", () => {
-      it("should ignore opening PI tag that is in a comment", () => {
-        // TODO:
-      });
-
-      it("should ignore closing PI tag that is in a comment", () => {
-        // TODO:
-      });
-
-      it("should ignore complete PI tag that is in a comment", () => {
-        // TODO:
+      it("should ignore PI tag that is in a comment", () => {
+        const xml = `<!-- <?ignore <T>50</T> ?> -->`;
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.numChildren).to.equal(1);
+        expect(doc.child.value).to.equal(" <?ignore <T>50</T> ?> ");
       });
 
       it("should ignore opening PI tag that is in a string", () => {
-        // TODO:
+        const xml = `<T n="<?">50</T>`;
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.numChildren).to.equal(1);
+        expect(doc.child.name).to.equal("<?");
+        expect(doc.child.innerValue).to.equal("50");
       });
 
       it("should ignore closing PI tag that is in a string", () => {
-        // TODO:
+        const xml = `<T n="?>">50</T>`;
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.numChildren).to.equal(1);
+        expect(doc.child.name).to.equal("?>");
+        expect(doc.child.innerValue).to.equal("50");
       });
 
       it("should ignore complete PI tag that is in a string", () => {
-        // TODO:
+        const xml = `<T n="<?ignore?>">50</T>`;
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.numChildren).to.equal(1);
+        expect(doc.child.name).to.equal("<?ignore?>");
+        expect(doc.child.innerValue).to.equal("50");
       });
     });
 
