@@ -380,27 +380,87 @@ describe('XmlDocumentNode', function () {
       });
 
       it("should ignore opening PI tag that is in a string", () => {
-        // TODO:
+        const xml = `<L>
+  <?ignore <T>FIRST</T> ?>
+  <T>SECOND</T>
+  <T n="something<?">THIRD</T>
+  <T>FOURTH</T>
+</L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.toXml()).to.equal(xml);
       });
 
       it("should ignore closing PI tag that is in a string", () => {
-        // TODO:
+        const xml = `<L>
+  <?ignore <T>FIRST</T> ?>
+  <T>SECOND</T>
+  <T n="something?>">THIRD</T>
+  <T>FOURTH</T>
+</L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.toXml()).to.equal(xml);
       });
 
       it("should ignore complete PI tag that is in a string", () => {
-        // TODO:
+        const xml = `<L>
+  <?ignore <T>FIRST</T> ?>
+  <T>SECOND</T>
+  <T n="<?ignore something ?>">THIRD</T>
+  <T>FOURTH</T>
+</L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.toXml()).to.equal(xml);
       });
 
       it("should ignore opening PI tag that is in a nested string", () => {
-        // TODO:
+        const xml = `<L>
+  <?ignore
+    <T n="<? Something">FIRST</T>
+  ?>
+  <T>SECOND</T>
+  <T>THIRD</T>
+  <T>FOURTH</T>
+</L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.toXml()).to.equal(xml);
       });
 
       it("should ignore closing PI tag that is in a nested string", () => {
-        // TODO:
+        const xml = `<L>
+  <?ignore
+    <T n="Something ?>">FIRST</T>
+  ?>
+  <T>SECOND</T>
+  <T>THIRD</T>
+  <T>FOURTH</T>
+</L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.toXml()).to.equal(xml);
       });
 
       it("should ignore complete PI tag that is in a nested string", () => {
-        // TODO:
+        const xml = `<L>
+  <?ignore
+    <T n="<?ignore Something ?>">FIRST</T>
+  ?>
+  <T>SECOND</T>
+  <T>THIRD</T>
+  <T>FOURTH</T>
+</L>`;
+
+        const doc = XmlDocumentNode.from(xml);
+        expect(doc.child.numChildren).to.equal(4);
+        expect(doc.toXml()).to.equal(xml);
       });
     });
   });
