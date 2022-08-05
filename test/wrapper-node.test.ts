@@ -247,7 +247,89 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#sort()", () => {
-    // TODO:
+    it("should sort in alphabetical order by name if no fn passed in", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({ tag: 'T', attributes: { n: "c" } }),
+          new XmlElementNode({ tag: 'T', attributes: { n: "a" } }),
+          new XmlElementNode({ tag: 'T', attributes: { n: "d" } }),
+          new XmlElementNode({ tag: 'T', attributes: { n: "b" } })
+        ]
+      });
+
+      node.sort();
+      expect(node.children[0].name).to.equal('a');
+      expect(node.children[1].name).to.equal('b');
+      expect(node.children[2].name).to.equal('c');
+      expect(node.children[3].name).to.equal('d');
+    });
+
+    it("should sort children according to the given function", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({
+            tag: 'T',
+            attributes: { n: "ten" },
+            children: [new XmlValueNode(10)]
+          }),
+          new XmlElementNode({
+            tag: 'T',
+            attributes: { n: "one" },
+            children: [new XmlValueNode(1)]
+          }),
+          new XmlElementNode({
+            tag: 'T',
+            attributes: { n: "five" },
+            children: [new XmlValueNode(5)]
+          })
+        ]
+      });
+
+      node.sort((a, b) => (a.innerValue as number) - (b.innerValue as number));
+      expect(node.children[0].name).to.equal('one');
+      expect(node.children[1].name).to.equal('five');
+      expect(node.children[2].name).to.equal('ten');
+    });
+
+    it("should not change the order of childrens' children", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({
+            tag: 'L',
+            attributes: { n: "list" },
+            children: [
+              new XmlElementNode({ tag: 'T', attributes: { n: "b" } }),
+              new XmlElementNode({ tag: 'T', attributes: { n: "a" } }),
+              new XmlElementNode({ tag: 'T', attributes: { n: "c" } })
+            ]
+          })
+        ]
+      });
+
+      node.sort();
+      expect(node.child.children[0].name).to.equal("b");
+      expect(node.child.children[1].name).to.equal("a");
+      expect(node.child.children[2].name).to.equal("c");
+    });
+
+    it("should not do anything when no children have names", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({ tag: "T" }),
+          new XmlElementNode({ tag: "L" }),
+          new XmlElementNode({ tag: "U" })
+        ]
+      });
+
+      node.sort();
+      expect(node.children[0].tag).to.equal("T");
+      expect(node.children[1].tag).to.equal("L");
+      expect(node.children[2].tag).to.equal("U");
+    });
   });
 
   describe("#toXml()", () => {
