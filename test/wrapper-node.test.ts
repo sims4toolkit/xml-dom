@@ -154,11 +154,27 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#type", () => {
-    // TODO:
+    it("should throw when trying to set", () => {
+      const node = newNode();
+      expect(() => node.type = "enabled").to.throw();
+    });
+
+    it("should be undefined", () => {
+      const node = newNode();
+      expect(node.type).to.be.undefined;
+    });
   });
 
   describe("#value", () => {
-    // TODO:
+    it("should be undefined", () => {
+      const node = newNode();
+      expect(node.value).to.be.undefined;
+    });
+
+    it("should throw when setting", () => {
+      const node = newNode();
+      expect(() => node.value = 1).to.throw();
+    });
   });
 
   //#endregion Properties
