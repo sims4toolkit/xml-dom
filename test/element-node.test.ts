@@ -358,14 +358,14 @@ describe('XmlElementNode', function () {
   });
 
   describe('#clone()', function () {
-    it('should return a new, empty document node if there are no children', function () {
+    it('should return a new, empty node if there are no children', function () {
       const node = newNode();
       expect(node.numChildren).to.equal(0);
       const clone = node.clone();
       expect(clone.numChildren).to.equal(0);
     });
 
-    it('should return a new document node with all children', function () {
+    it('should return a new node with all children', function () {
       const node = newNode();
       node.addChildren(new XmlValueNode(5), new XmlCommentNode("hi"));
       expect(node.numChildren).to.equal(2);

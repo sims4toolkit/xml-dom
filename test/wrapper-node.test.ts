@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { XmlElementNode, XmlNode, XmlValueNode } from "../dst/xml";
+import { XmlCommentNode, XmlElementNode, XmlNode, XmlValueNode } from "../dst/xml";
 import { XmlWrapperNode } from "../dst/xml";
 
 describe("XmlWrapperNode", () => {
@@ -200,7 +200,43 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#clone()", () => {
-    // TODO:
+    it("should return a new, empty node if there are no children", () => {
+      const node = newNode();
+      expect(node.numChildren).to.equal(0);
+      const clone = node.clone();
+      expect(clone.numChildren).to.equal(0);
+    });
+
+    it("should return a new node with all children", () => {
+      const node = newNode();
+      node.addChildren(new XmlValueNode(5), new XmlCommentNode("hi"));
+      expect(node.numChildren).to.equal(2);
+      const clone = node.clone();
+      expect(clone.numChildren).to.equal(2);
+      expect(clone.children[0].value).to.equal(5);
+      expect(clone.children[1].value).to.equal("hi");
+    });
+
+    it("should not mutate the children array of the original", () => {
+      const node = newNode();
+      const clone = node.clone();
+      expect(node.numChildren).to.equal(0);
+      expect(clone.numChildren).to.equal(0);
+      clone.innerValue = 5;
+      expect(node.numChildren).to.equal(0);
+      expect(clone.numChildren).to.equal(1);
+    });
+
+    it("should not mutate the individual children of the original", () => {
+      const node = newNode();
+      node.addChildren(new XmlValueNode(5));
+      const clone = node.clone();
+      expect(node.innerValue).to.equal(5);
+      expect(clone.innerValue).to.equal(5);
+      clone.innerValue = 10;
+      expect(node.innerValue).to.equal(5);
+      expect(clone.innerValue).to.equal(10);
+    });
   });
 
   describe("#deepSort()", () => {
