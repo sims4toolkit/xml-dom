@@ -130,6 +130,70 @@ describe('XmlDocumentNode', function () {
       expect(dom.numChildren).to.equal(1);
       expect(dom.child.tag).to.equal("I");
     });
+
+    context("has no PI tags", () => {
+      it("should ignore opening PI tag that is in a comment", () => {
+        // TODO:
+      });
+
+      it("should ignore closing PI tag that is in a comment", () => {
+        // TODO:
+      });
+
+      it("should ignore opening PI tag that is in a string", () => {
+        // TODO:
+      });
+
+      it("should ignore closing PI tag that is in a string", () => {
+        // TODO:
+      });
+    });
+
+    context("has at least one PI tag", () => {
+      it("should ignore PI tags if instructed to", () => {
+        // TODO:
+      });
+
+      it("should parse PI tags with attributes only", () => {
+        // TODO:
+      });
+
+      it("should parse PI tags with plain text", () => {
+        // TODO:
+      });
+
+      it("should parse PI tags with no content", () => {
+        // TODO:
+      });
+
+      it("should parse PI tags with XML content", () => {
+        // TODO:
+      });
+
+      it("should parse multiple PI tags of same type", () => {
+        // TODO:
+      });
+
+      it("should parse multiple PI tags of different types", () => {
+        // TODO:
+      });
+
+      it("should ignore opening PI tag that is in a comment", () => {
+        // TODO:
+      });
+
+      it("should ignore closing PI tag that is in a comment", () => {
+        // TODO:
+      });
+
+      it("should ignore opening PI tag that is in a string", () => {
+        // TODO:
+      });
+
+      it("should ignore closing PI tag that is in a string", () => {
+        // TODO:
+      });
+    });
   });
 
   describe('#attributes', function () {
