@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { XmlNode, XmlValueNode } from "../dst/xml";
+import { XmlElementNode, XmlNode, XmlValueNode } from "../dst/xml";
 import { XmlWrapperNode } from "../dst/xml";
 
 describe("XmlWrapperNode", () => {
@@ -208,7 +208,42 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#findChild()", () => {
-    // TODO:
+    it("should return undefined if the child doesn't exist", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            attributes: { n: "first" },
+          }),
+          new XmlElementNode({
+            tag: "E",
+            attributes: { n: "second" }
+          })
+        ]
+      });
+
+      expect(node.findChild("third")).to.be.undefined;
+    });
+
+    it("should return the first child with the given name", () => {
+      const node = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            attributes: { n: "first" },
+          }),
+          new XmlElementNode({
+            tag: "E",
+            attributes: { n: "second" }
+          })
+        ]
+      });
+
+      expect(node.findChild("first").tag).to.equal("T");
+      expect(node.findChild("second").tag).to.equal("E");
+    });
   });
 
   describe("#sort()", () => {
