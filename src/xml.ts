@@ -3,7 +3,10 @@ import { X2jOptions, XMLParser } from "fast-xml-parser";
 //#region Types
 
 /** The line that appears at the top of XML files. */
-const XML_DECLARATION = '<?xml version="1.0" encoding="utf-8"?>';
+const DEFAULT_XML_DECLARATION = () => ({
+  version: "1.0",
+  encoding: "utf-8"
+});
 
 /** Generic interface that can support any attributes. */
 type Attributes = { [key: string]: any; };
@@ -32,8 +35,15 @@ interface XmlFormattingOptions extends Partial<{
   spacesPerIndent: number;
 
   /**
+   * Whether or not to include comments. If minifying, this option is ignored.
+   * (Default = true)
+   */
+  // writeComments: boolean;
+
+  /**
    * Whether or not to include any XML processing instructions other than the
-   * XML declaration at the top of the file. (Default = true)
+   * XML declaration at the top of the file. If minifying, this option is
+   * ignored. (Default = true)
    */
   writeProcessingInstructions: boolean;
 
@@ -383,14 +393,29 @@ abstract class XmlNodeBase implements XmlNode {
 
 /** A complete XML document with children. */
 export class XmlDocumentNode extends XmlNodeBase {
+  protected _declaration?: Attributes;
+
+  /** The attributes that should appear in the XML declaration. */
+  get declaration(): Attributes {
+    return this._declaration;
+  }
+
   /**
    * Creates a new XmlDocumentNode from the given root node. If no root node
    * is given, then this document is empty.
    * 
+   * Options
+   * - `declaration`: Object of attributes to use in the XML declaration. Value
+   *   is `{ version: "1.0", encoding: "utf-8" }` by default.
+   * 
    * @param root Optional node to use at the root of this document
+   * @param options Optional arguments
    */
-  constructor(root?: XmlNode) {
+  constructor(root?: XmlNode, options?: {
+    declaration?: Attributes
+  }) {
     super({ children: (root ? [root] : []) })
+    this._declaration = options?.declaration ?? DEFAULT_XML_DECLARATION();
   }
 
   /**
@@ -416,10 +441,15 @@ export class XmlDocumentNode extends XmlNodeBase {
     ignoreComments?: boolean;
     ignoreProcessingInstructions?: boolean;
   } = {}): XmlDocumentNode {
-    const nodes = parseXml(xml, !ignoreComments, !ignoreProcessingInstructions);
-    if (nodes.length <= 1) return new XmlDocumentNode(nodes[0]);
+    const { nodes, declaration } =
+      parseXml(xml, !ignoreComments, !ignoreProcessingInstructions);
+
+    if (nodes.length <= 1) return new XmlDocumentNode(nodes[0], {
+      declaration
+    });
+
     if (allowMultipleRoots) {
-      const doc = new XmlDocumentNode();
+      const doc = new XmlDocumentNode(null, { declaration });
       doc.children.push(...nodes);
       return doc;
     } else {
@@ -447,13 +477,14 @@ export class XmlDocumentNode extends XmlNodeBase {
     indents = 0,
     minify = false,
     spacesPerIndent = 2,
+    // writeComments = true,
     writeProcessingInstructions = true,
     writeXmlDeclaration = true
   }: XmlFormattingOptions = {}): string {
     const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
     const lines: string[] = [];
     if (writeXmlDeclaration)
-      lines.push(`${spaces}${XML_DECLARATION}`);
+      lines.push(`${spaces}<?xml${getAttrsString(this.declaration)}?>`);
 
     this.children.forEach(child => {
       if (writeProcessingInstructions || !(child instanceof XmlWrapperNode))
@@ -506,20 +537,8 @@ export class XmlElementNode extends XmlNodeBase {
   }: XmlElementFormattingOptions = {}): string {
     const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
     const lines: string[] = [];
+    const attrString = getAttrsString(this.attributes);
 
-    // attributes
-    const attrKeys = Object.keys(this.attributes);
-    const attrNodes: string[] = [];
-    if (attrKeys.length > 0) {
-      attrNodes.push(''); // just for spacing
-      attrKeys.forEach(key => {
-        const value = formatValue(this.attributes[key]);
-        attrNodes.push(`${key}="${value}"`);
-      });
-    }
-    const attrString = attrNodes.join(' ');
-
-    // tags & children
     if (this.numChildren === 0) {
       lines.push(`${spaces}<${this.tag}${attrString}/>`);
     } else {
@@ -697,10 +716,12 @@ function parseXml(
   xml: string | Buffer,
   parseComments: boolean,
   parsePiTags: boolean,
-): XmlNode[] {
+): {
+  nodes: XmlNode[];
+  declaration: Attributes;
+} {
   try {
     const options: Partial<X2jOptions> = {
-      ignoreDeclaration: true,
       ignoreAttributes: false,
       attributeNamePrefix: "",
       parseAttributeValue: false,
@@ -720,6 +741,7 @@ function parseXml(
     }
 
     const nodeObjs: NodeObj[] = parser.parse(xml);
+    let declaration: Attributes;
 
     function parseNodeObj(nodeObj: NodeObj): XmlNode {
       if (nodeObj.comment) {
@@ -731,10 +753,14 @@ function parseXml(
         let children: XmlNode[];
         let attributes: Attributes = {};
         let isWrapper = false;
+        let isDeclaration = false;
 
         for (const key in nodeObj) {
           if (key === ":@") {
             Object.assign(attributes, nodeObj[key]);
+          } else if (key.startsWith("?xml")) {
+            if (declaration) return undefined;
+            isDeclaration = true;
           } else if (key === PI_NODE_TAG) {
             isWrapper = true;
             children = parseNodeObjArray(nodeObj[key]);
@@ -747,9 +773,13 @@ function parseXml(
           }
         }
 
-        return isWrapper
-          ? new XmlWrapperNode({ tag: attributes.tag, children })
-          : new XmlElementNode({ tag, children, attributes });
+        if (isDeclaration) {
+          declaration = attributes;
+        } else {
+          return isWrapper
+            ? new XmlWrapperNode({ tag: attributes.tag, children })
+            : new XmlElementNode({ tag, children, attributes });
+        }
       }
     }
 
@@ -758,7 +788,10 @@ function parseXml(
     }
 
     try {
-      return parseNodeObjArray(nodeObjs);
+      return {
+        nodes: parseNodeObjArray(nodeObjs),
+        declaration
+      };
     } catch (e) {
       if (e instanceof UnescapedProcessingInstructionsError) {
         return parseXml(
@@ -794,6 +827,24 @@ function replaceProcessingInstructions(xml: string | Buffer): string {
       .replace(piCloseTagRegex, "");
     return `<${PI_NODE_TAG} tag="${tag}">${innerContent}</${PI_NODE_TAG}>`;
   });
+}
+
+/**
+ * Formats the given attributes into a string.
+ * 
+ * @param attrs Attributes to get string for
+ */
+function getAttrsString(attrs: Attributes): string {
+  const attrKeys = Object.keys(attrs);
+  const attrNodes: string[] = [];
+  if (attrKeys.length > 0) {
+    attrNodes.push(''); // just for spacing
+    attrKeys.forEach(key => {
+      const value = formatValue(attrs[key]);
+      attrNodes.push(`${key}="${value}"`);
+    });
+  }
+  return attrNodes.join(' ');
 }
 
 //#endregion Helpers

@@ -24,6 +24,20 @@
   },
   "sections": [
     {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "prefix": "get",
+          "name": "declaration",
+          "description": "The attributes that should appear in the XML declaration.",
+          "type": {
+            "name": "object"
+          }
+        }
+      ]
+    },
+    {
       "title": "Intialization",
       "content": [
         {
@@ -35,8 +49,8 @@
           "description": "Creates a new XmlDocumentNode.",
           "arguments": [
             {
-              "optional": true,
               "name": "root",
+              "optional": true,
               "type": {
                 "name": "XmlNode",
                 "path": {
@@ -46,6 +60,24 @@
                 }
               },
               "description": "Node to use as the root of this document."
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "type": {
+                "name": "object"
+              },
+              "description": "Optional arguments.",
+              "properties": [
+                {
+                  "name": "declaration",
+                  "optional": true,
+                  "type": {
+                    "name": "object"
+                  },
+                  "description": "The attributes to use in the XML declaration. Default value is `{ version: \"1.0\", encoding: \"utf-8\" }`."
+                }
+              ]
             }
           ],
           "examples": [

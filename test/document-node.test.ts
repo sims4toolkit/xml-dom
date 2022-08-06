@@ -15,6 +15,14 @@ describe('XmlDocumentNode', function () {
       expect(node.numChildren).to.equal(1);
       expect(node.child.value).to.equal(5);
     });
+
+    it("should use the XML declaration that is provided", () => {
+      // TODO:
+    });
+
+    it("should use the default XML declaration if there isn't one", () => {
+      // TODO:
+    });
   });
 
   describe('#from()', function () {
@@ -129,6 +137,14 @@ describe('XmlDocumentNode', function () {
       const dom = XmlDocumentNode.from(`<?xml version="1.0" encoding="utf-8"?>\n<I n="some_file"/>`);
       expect(dom.numChildren).to.equal(1);
       expect(dom.child.tag).to.equal("I");
+    });
+
+    it("should parse the XML declaration that is provided", () => {
+      // TODO:
+    });
+
+    it("should use the default XML declaration if there isn't one", () => {
+      // TODO:
     });
 
     context("has no PI tags", () => {
@@ -411,6 +427,20 @@ describe('XmlDocumentNode', function () {
       const node = newNode();
       node.children.push(new XmlValueNode("hi"), new XmlValueNode("bye"));
       expect(node.numChildren).to.equal(2);
+    });
+  });
+
+  describe("#declaration", () => {
+    it("should throw when assigned", () => {
+      // TODO:
+    });
+
+    it("should return the declaration", () => {
+      // TODO:
+    });
+
+    it("should mutate the declaration", () => {
+      // TODO:
     });
   });
 
@@ -928,6 +958,10 @@ describe('XmlDocumentNode', function () {
       const doc = new XmlDocumentNode(root);
 
       expect(doc.toXml({ minify: true })).to.equal(`${XML_DECLARATION}<L n="some_list"><T>12345<!--some_tuning--></T></L>`);
+    });
+
+    it("should use the declaration attrs if there are any", () => {
+      // TODO:
     });
   });
 });

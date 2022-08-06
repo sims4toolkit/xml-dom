@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0] - 2022/08/05
 ### Added
-- Properly parse processing instruction nodes as XML wrappers.
+- Add `XmlWrapperNode` to parse PI tags.
 - Add `writeProcessingInstructions` and `minify` options to `XmlFormattingOptions`.
+- Add `declaration` property to XmlDocumentNode.
 ### Changed
 - Rename `includeProcessingInstructions` option in `XmlFormattingOptions` to `writeXmlDeclaration`.
+- XML documents now preserve the XML declaration they had when parsed.
 
 ## [0.1.3] - 2022/02/17
 ### Changed
