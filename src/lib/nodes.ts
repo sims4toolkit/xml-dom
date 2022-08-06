@@ -2,6 +2,7 @@ import { X2jOptions, XMLParser } from "fast-xml-parser";
 import type {
   Attributes,
   CompleteXmlFormattingOptions,
+  RecycledNodeRef,
   XmlElementFormattingOptions,
   XmlFormattingOptions,
   XmlParsingOptions,
@@ -624,6 +625,7 @@ function parseXml(
         comments: new Map(),
         elements: new Map(),
         idMap: new Map(),
+        nextId: 0,
         values: new Map(),
         wrappers: new Map()
       };
@@ -637,13 +639,60 @@ function parseXml(
     }
 
     const nodeObjs: X2jNodeObj[] = parser.parse(xml);
+    const nodeCache = options?.recycledNodesCache;
     let declaration: Attributes;
+
+    function parseCommentNode(nodeObj: X2jNodeObj): XmlCommentNode {
+      const value = nodeObj.comment[0].value;
+
+      if (!options?.recycleNodes) return new XmlCommentNode(value);
+
+      if (nodeCache.comments.has(value)) {
+        const nodeRef = nodeCache.comments.get(value);
+        nodeRef.refs++;
+        return nodeRef.node;
+      } else {
+        const nodeRef: RecycledNodeRef<XmlCommentNode> = {
+          id: nodeCache.nextId++,
+          node: new XmlCommentNode(value),
+          refs: 1
+        };
+
+        nodeCache.comments.set(value, nodeRef);
+        nodeCache.idMap.set(nodeRef.id, nodeRef);
+        return nodeRef.node;
+      }
+    }
+
+    function parseValueNode(nodeObj: X2jNodeObj): XmlValueNode {
+      const value = nodeObj.value;
+
+      if (!options?.recycleNodes) return new XmlValueNode(value);
+
+      const stringValue = formatValue(value);
+
+      if (nodeCache.values.has(stringValue)) {
+        const nodeRef = nodeCache.values.get(stringValue);
+        nodeRef.refs++;
+        return nodeRef.node;
+      } else {
+        const nodeRef: RecycledNodeRef<XmlValueNode> = {
+          id: nodeCache.nextId++,
+          node: new XmlValueNode(value),
+          refs: 1
+        };
+
+        nodeCache.values.set(stringValue, nodeRef);
+        nodeCache.idMap.set(nodeRef.id, nodeRef);
+        return nodeRef.node;
+      }
+    }
 
     function parseNodeObj(nodeObj: X2jNodeObj): XmlNode {
       if (nodeObj.comment) {
-        return new XmlCommentNode(nodeObj.comment[0].value);
+        return parseCommentNode(nodeObj);
       } else if (nodeObj.value) {
-        return new XmlValueNode(nodeObj.value);
+        return parseValueNode(nodeObj);
       } else {
         let tag: string;
         let children: XmlNode[];

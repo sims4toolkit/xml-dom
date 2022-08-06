@@ -64,6 +64,11 @@ export interface RecycledNodesCache {
   idMap: Map<number, RecycledNodeRef<XmlNode>>;
 
   /**
+   * The unique ID to use for the next node.
+   */
+  nextId: number;
+
+  /**
    * Mapping of value nodes.
    * 
    * ### Key
