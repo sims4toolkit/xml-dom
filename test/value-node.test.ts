@@ -249,6 +249,14 @@ describe('XmlValueNode', function () {
     it("should return a blank string when there is no value", function () {
       const node = new XmlValueNode();
       expect(node.toXml()).to.equal('');
-    })
+    });
+
+    it("should not write whitespace if minify = true", () => {
+      const node = new XmlValueNode("text");
+      expect(node.toXml({
+        indents: 1,
+        minify: true
+      })).to.equal("text");
+    });
   });
 });

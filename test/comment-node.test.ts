@@ -234,5 +234,13 @@ describe('XmlCommentNode', function () {
       const node = new XmlCommentNode();
       expect(node.toXml()).to.equal('<!---->');
     });
+
+    it("should not write whitespace if minify = true", () => {
+      const node = new XmlCommentNode("text");
+      expect(node.toXml({
+        indents: 1,
+        minify: true
+      })).to.equal("<!--text-->");
+    });
   });
 });
