@@ -153,11 +153,20 @@ describe('XmlDocumentNode', function () {
     });
 
     it("should parse the XML declaration that is provided", () => {
-      // TODO:
+      const xml = `<?xml version="2.0" something="idk"?><L><T>12345</T></L>`;
+      const doc = XmlDocumentNode.from(xml);
+      expect(doc.declaration).to.be.an("Object");
+      expect(doc.declaration.version).to.equal("2.0");
+      expect(doc.declaration.something).to.equal("idk");
+      expect(doc.declaration.encoding).to.be.undefined;
     });
 
     it("should use the default XML declaration if there isn't one", () => {
-      // TODO:
+      const xml = `<L><T>12345</T></L>`;
+      const doc = XmlDocumentNode.from(xml);
+      expect(doc.declaration).to.be.an("Object");
+      expect(doc.declaration.version).to.equal("1.0");
+      expect(doc.declaration.encoding).to.equal("utf-8");
     });
 
     context("has no PI tags", () => {
