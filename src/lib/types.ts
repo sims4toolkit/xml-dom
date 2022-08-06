@@ -131,6 +131,12 @@ export interface XmlParsingResult {
    * The child nodes of the XML document.
    */
   nodes: XmlNode[];
+
+  /**
+   * The cache that was used to recycle nodes. Guaranteed to be defined if
+   * `recycleNodes = true` was true when parsing.
+   */
+  recylingCache?: RecycledNodesCache;
 }
 
 /** Options to use when writing a node as an XML string. */
