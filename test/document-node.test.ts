@@ -961,7 +961,39 @@ describe('XmlDocumentNode', function () {
     });
 
     it("should use the declaration attrs if there are any", () => {
-      // TODO:
+      const root = new XmlElementNode({ tag: "T" });
+      const doc = new XmlDocumentNode(root, {
+        declaration: {
+          version: "2.0",
+          something: "idk"
+        }
+      });
+
+      expect(doc.toXml()).to.equal(`<?xml version="2.0" something="idk"?>\n<T/>`);
+    });
+
+    it("should not write any comments if writeComments = false", () => {
+      const root = new XmlElementNode({
+        tag: "L",
+        attributes: {
+          n: "some_list"
+        },
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode(12345),
+              new XmlCommentNode("some_tuning")
+            ]
+          })
+        ]
+      });
+
+      const doc = new XmlDocumentNode(root);
+
+      expect(doc.toXml({ writeComments: false })).to.equal(`${XML_DECLARATION}<L n="some_list">
+  <T>12345</T>
+</L>`);
     });
   });
 });
