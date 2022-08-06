@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { XmlElementNode, XmlValueNode, XmlCommentNode } from "../dst/xml";
+import { XmlElementNode, XmlValueNode, XmlCommentNode, XmlWrapperNode } from "../dst/xml";
 
 describe('XmlElementNode', function () {
   const newNode = (tag = "T") => new XmlElementNode({ tag });
@@ -678,6 +678,72 @@ describe('XmlElementNode', function () {
     <T n="second">456</T>
   </U>
 </L>`);
+    });
+
+    it("should write PI tags by default", () => {
+      const node = new XmlElementNode({
+        tag: "L",
+        children: [
+          new XmlWrapperNode({
+            tag: "ignore",
+            children: [
+              new XmlElementNode({
+                tag: "T",
+                children: [
+                  new XmlValueNode(12345)
+                ]
+              })
+            ]
+          })
+        ]
+      });
+
+      expect(node.toXml()).to.equal(`<L>
+  <?ignore
+    <T>12345</T>
+  ?>
+</L>`);
+    });
+
+    it("should not write PI tags if told not to", () => {
+      const node = new XmlElementNode({
+        tag: "L",
+        children: [
+          new XmlWrapperNode({
+            tag: "ignore",
+            children: [
+              new XmlElementNode({
+                tag: "T",
+                children: [
+                  new XmlValueNode(12345)
+                ]
+              })
+            ]
+          })
+        ]
+      });
+
+      expect(node.toXml({ writeProcessingInstructions: false })).to.equal(`<L>\n</L>`);
+    });
+
+    it("should not write whitespace if minify = true", () => {
+      const node = new XmlElementNode({
+        tag: "L",
+        attributes: {
+          n: "some_list"
+        },
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode(12345),
+              new XmlCommentNode("some_tuning")
+            ]
+          })
+        ]
+      });
+
+      expect(node.toXml({ minify: true })).to.equal(`<L n="some_list"><T>12345<!--some_tuning--></T></L>`);
     });
   });
 });
