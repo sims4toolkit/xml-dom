@@ -498,9 +498,6 @@ export class XmlElementNode extends XmlNodeBase {
     const spaces = " ".repeat(indents * spacesPerIndent);
     const lines: string[] = [];
 
-    const shouldWriteChild = (child: XmlNode) =>
-      (writeProcessingInstructions || !(child instanceof XmlWrapperNode));
-
     // attributes
     const attrKeys = Object.keys(this.attributes);
     const attrNodes: string[] = [];
@@ -516,20 +513,28 @@ export class XmlElementNode extends XmlNodeBase {
     // tags & children
     if (this.numChildren === 0) {
       lines.push(`${spaces}<${this.tag}${attrString}/>`);
-    } else if (this.numChildren <= 2 && !this.child.hasChildren) {
-      const value = this.children.map(child => {
-        return shouldWriteChild(child)
-          ? child.toXml()
-          : "";
-      }).join('');
-      lines.push(`${spaces}<${this.tag}${attrString}>${value}</${this.tag}>`);
     } else {
-      lines.push(`${spaces}<${this.tag}${attrString}>`);
-      this.children.forEach(child => {
-        if (shouldWriteChild(child))
-          lines.push(child.toXml({ indents: indents + 1, spacesPerIndent }));
-      });
-      lines.push(`${spaces}</${this.tag}>`);
+      const shouldWriteChild = (child: XmlNode) =>
+        (writeProcessingInstructions || !(child instanceof XmlWrapperNode));
+
+      if (this.numChildren <= 2 && !this.child.hasChildren) {
+        const value = this.children.map(child => {
+          return shouldWriteChild(child)
+            ? child.toXml()
+            : "";
+        }).join('');
+        lines.push(`${spaces}<${this.tag}${attrString}>${value}</${this.tag}>`);
+      } else {
+        lines.push(`${spaces}<${this.tag}${attrString}>`);
+        this.children.forEach(child => {
+          if (shouldWriteChild(child)) lines.push(child.toXml({
+            indents: indents + 1,
+            spacesPerIndent,
+            writeProcessingInstructions
+          }));
+        });
+        lines.push(`${spaces}</${this.tag}>`);
+      }
     }
 
     return lines.join('\n');
