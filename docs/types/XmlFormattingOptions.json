@@ -17,15 +17,6 @@
       "content": [
         {
           "displayType": "property",
-          "name": "includeProcessingInstructions",
-          "optional": true,
-          "description": "Whether or not to include the XML processing instruction tag at the top of this output. Only applicable to document nodes. (Default = true)",
-          "type": {
-            "name": "boolean"
-          }
-        },
-        {
-          "displayType": "property",
           "name": "indents",
           "optional": true,
           "description": "Number of times to indent this node. This will increase by 1 for each recursive call. (Default = 0)",
@@ -40,6 +31,24 @@
           "description": "Number of spaces to use per indent. (Default = 2)",
           "type": {
             "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "writeProcessingInstructions",
+          "optional": true,
+          "description": "Whether or not to include any XML processing instructions other than the XML declaration at the top of the file. (Default = true)",
+          "type": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "writeXmlDeclaration",
+          "optional": true,
+          "description": "Whether or not to include the XML declaration at the top of the file. Only applicable to document nodes. (Default = true)",
+          "type": {
+            "name": "boolean"
           }
         }
       ]
