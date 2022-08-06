@@ -745,5 +745,27 @@ describe('XmlElementNode', function () {
 
       expect(node.toXml({ minify: true })).to.equal(`<L n="some_list"><T>12345<!--some_tuning--></T></L>`);
     });
+
+    it("should not write any comments if writeComments = false", () => {
+      const node = new XmlElementNode({
+        tag: "L",
+        attributes: {
+          n: "some_list"
+        },
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode(12345),
+              new XmlCommentNode("some_tuning")
+            ]
+          })
+        ]
+      });
+
+      expect(node.toXml({ writeComments: false })).to.equal(`<L n="some_list">
+  <T>12345</T>
+</L>`);
+    });
   });
 });
