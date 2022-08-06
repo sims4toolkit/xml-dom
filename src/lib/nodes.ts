@@ -7,6 +7,7 @@ import type {
   XmlElementFormattingOptions,
   XmlFormattingOptions,
   XmlParsingOptions,
+  XmlParsingRecycledResult,
   XmlParsingResult,
   XmlValue,
   XmlValueFormattingOptions
@@ -395,10 +396,7 @@ export class XmlDocumentNode extends XmlNodeBase {
   static fromRecycled(
     xml: string | Buffer,
     options: Omit<XmlParsingOptions, "recycleNodes"> = {}
-  ): {
-    doc: XmlDocumentNode,
-    recylingCache: RecycledNodesCache
-  } {
+  ): XmlParsingRecycledResult {
     (options as XmlParsingOptions).recycleNodes = true;
     const { nodes, declaration, recylingCache } = parseXml(xml, options);
     const doc = new XmlDocumentNode(undefined, { declaration });

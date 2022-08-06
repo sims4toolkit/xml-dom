@@ -1,4 +1,4 @@
-import type { XmlNode, XmlElementNode, XmlCommentNode, XmlValueNode, XmlWrapperNode } from "./nodes";
+import type { XmlNode, XmlElementNode, XmlCommentNode, XmlValueNode, XmlWrapperNode, XmlDocumentNode } from "./nodes";
 
 /** Generic interface that can support any attributes. */
 export type Attributes = { [key: string]: any; };
@@ -142,6 +142,20 @@ export interface XmlParsingResult {
    * `recycleNodes = true` was true when parsing.
    */
   recylingCache?: RecycledNodesCache;
+}
+
+/** The result of parsing XML with recycled cells. */
+export interface XmlParsingRecycledResult {
+  /**
+   * The XML document that was parsed.
+   */
+  doc: XmlDocumentNode;
+
+  /**
+   * The cache that was used to recycle nodes. Guaranteed to be defined if
+   * `recycleNodes = true` was true when parsing.
+   */
+  recylingCache: RecycledNodesCache;
 }
 
 /** Options to use when writing a node as an XML string. */

@@ -109,49 +109,56 @@
             {
               "name": "options",
               "optional": true,
-              "description": "Object containing optional settings.",
+              "description": "Object containing options.",
               "type": {
-                "name": "object"
-              },
-              "properties": [
-                {
-                  "name": "allowMultipleRoots",
-                  "optional": true,
-                  "description": "Whether or not to allow multiple root nodes. If false, an exception is thrown if there is more than one root. False by default.",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "name": "ignoreComments",
-                  "optional": true,
-                  "description": "Whether or not to ignore comments while parsing XML. If true, then comments will be entirely left out. False by default.",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "name": "ignoreProcessingInstructions",
-                  "optional": true,
-                  "description": "Whether or not to ignore processing intructions while parsing XML. If true, then PI tags (other than the XML declaration) will be entirely left out. False by default.",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "name": "recycleNodes",
-                  "optional": true,
-                  "description": "Whether or not nodes that share the exact same structure should be loaded once and only once. This should never be true if you intend on modifying the DOM at all, as doing so can lead to unintended side effects. False by default.",
-                  "type": {
-                    "name": "boolean"
-                  }
+                "name": "XmlParsingOptions",
+                "path": {
+                  "pkg": "xml-dom",
+                  "group": "types",
+                  "item": "XmlParsingOptions"
                 }
-              ]
+              }
             }
           ],
           "examples": [
             {
               "code": "const xml = `<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<M n=\"some.module\" s=\"15948711490371124562\">\n  <C n=\"SomeClass\">\n    <T n=\"NUMBER\">50</T>\n    <T n=\"BOOLEAN\">True</T>\n  </C>\n</M>`;\n\nconst docFromXml = XmlDocumentNode.from(xml);"
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "prefix": "static",
+          "name": "fromRecycled",
+          "returnType": {
+            "name": "XmlParsingRecycledResult",
+            "path": {
+              "pkg": "xml-dom",
+              "group": "types",
+              "item": "XmlParsingRecycledResult"
+            }
+          },
+          "description": "Parses the given XML data as a XmlDocumentNode, reusing nodes that share the same structure, and returns the document with the built cache.",
+          "arguments": [
+            {
+              "name": "xml",
+              "type": {
+                "name": "string | Buffer"
+              },
+              "description": "XML content to create document from."
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "description": "Object containing options.",
+              "type": {
+                "name": "Omit<XmlParsingOptions, \"recycleNodes\">",
+                "path": {
+                  "pkg": "xml-dom",
+                  "group": "types",
+                  "item": "XmlParsingOptions"
+                }
+              }
             }
           ]
         }

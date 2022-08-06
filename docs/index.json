@@ -29,6 +29,7 @@
         "RecycledNodesCache",
         "XmlFormattingOptions",
         "XmlParsingOptions",
+        "XmlParsingRecycledResult",
         "XmlValue"
       ]
     }
