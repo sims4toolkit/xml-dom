@@ -619,17 +619,25 @@ function parseXml(
     if (!options?.ignoreComments) x2jOptions.commentPropName = "comment";
     const parser = new XMLParser(x2jOptions);
 
-    interface NodeObj {
+    if (options?.recycleNodes) options.recycledNodesCache = {
+      comments: new Map(),
+      elements: new Map(),
+      idMap: new Map(),
+      values: new Map(),
+      wrappers: new Map()
+    };
+
+    interface X2jNodeObj {
       value?: number | bigint | string;
       comment?: { value: string }[];
       attributes?: { [key: string]: string };
       [key: string]: any;
     }
 
-    const nodeObjs: NodeObj[] = parser.parse(xml);
+    const nodeObjs: X2jNodeObj[] = parser.parse(xml);
     let declaration: Attributes;
 
-    function parseNodeObj(nodeObj: NodeObj): XmlNode {
+    function parseNodeObj(nodeObj: X2jNodeObj): XmlNode {
       if (nodeObj.comment) {
         return new XmlCommentNode(nodeObj.comment[0].value);
       } else if (nodeObj.value) {
@@ -669,7 +677,7 @@ function parseXml(
       }
     }
 
-    function parseNodeObjArray(nodeObjArr: NodeObj[]): XmlNode[] {
+    function parseNodeObjArray(nodeObjArr: X2jNodeObj[]): XmlNode[] {
       return nodeObjArr.map(parseNodeObj).filter((n: any) => n);
     }
 
