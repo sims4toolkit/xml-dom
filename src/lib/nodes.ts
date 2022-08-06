@@ -836,7 +836,7 @@ function joinXmlLines(
 /**
  * Returns the default declaration to use for XML documents.
  */
-function getDefaultDeclaration() {
+function getDefaultDeclaration(): Attributes {
   return {
     version: "1.0",
     encoding: "utf-8"
