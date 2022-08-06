@@ -465,7 +465,7 @@ export class XmlDocumentNode extends XmlNodeBase {
         }));
     });
 
-    return lines.join('\n');
+    return lines.join(minify ? "" : "\n");
   }
 }
 

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import type { XmlNode } from "../dst/xml";
+import { XmlNode, XmlWrapperNode } from "../dst/xml";
 import { XmlDocumentNode, XmlElementNode, XmlValueNode, XmlCommentNode } from "../dst/xml";
 
 describe('XmlDocumentNode', function () {
@@ -855,6 +855,79 @@ describe('XmlDocumentNode', function () {
     <T n="SOMETHING">10</T>
   </C>
 </M>`);
+    });
+
+    it("should write PI tags by default", () => {
+      const root = new XmlElementNode({
+        tag: "L",
+        children: [
+          new XmlWrapperNode({
+            tag: "ignore",
+            children: [
+              new XmlElementNode({
+                tag: "T",
+                children: [
+                  new XmlValueNode(12345)
+                ]
+              })
+            ]
+          })
+        ]
+      });
+
+      const doc = new XmlDocumentNode(root);
+
+      expect(doc.toXml()).to.equal(`${XML_DECLARATION}
+<L>
+  <?ignore
+    <T>12345</T>
+  ?>
+</L>`);
+    });
+
+    it("should not write PI tags if told not to", () => {
+      const root = new XmlElementNode({
+        tag: "L",
+        children: [
+          new XmlWrapperNode({
+            tag: "ignore",
+            children: [
+              new XmlElementNode({
+                tag: "T",
+                children: [
+                  new XmlValueNode(12345)
+                ]
+              })
+            ]
+          })
+        ]
+      });
+
+      const doc = new XmlDocumentNode(root);
+
+      expect(doc.toXml({ writeProcessingInstructions: false })).to.equal(`${XML_DECLARATION}\n<L>\n</L>`);
+    });
+
+    it("should not write whitespace if minify = true", () => {
+      const root = new XmlElementNode({
+        tag: "L",
+        attributes: {
+          n: "some_list"
+        },
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode(12345),
+              new XmlCommentNode("some_tuning")
+            ]
+          })
+        ]
+      });
+
+      const doc = new XmlDocumentNode(root);
+
+      expect(doc.toXml({ minify: true })).to.equal(`${XML_DECLARATION}<L n="some_list"><T>12345<!--some_tuning--></T></L>`);
     });
   });
 });
