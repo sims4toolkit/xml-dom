@@ -5,6 +5,7 @@ import type {
   XmlElementFormattingOptions,
   XmlFormattingOptions,
   XmlParsingOptions,
+  XmlParsingResult,
   XmlValue,
   XmlValueFormattingOptions
 } from "./types";
@@ -604,10 +605,7 @@ const PI_NODE_TAG = "__PI_NODE";
 function parseXml(
   xml: string | Buffer,
   options?: XmlParsingOptions
-): {
-  nodes: XmlNode[];
-  declaration: Attributes;
-} {
+): XmlParsingResult {
   try {
     const x2jOptions: Partial<X2jOptions> = {
       ignoreAttributes: false,

@@ -120,6 +120,19 @@ export interface XmlParsingOptions extends Partial<{
   recycleNodes: boolean;
 }> { }
 
+/** The result of parsing XML. */
+export interface XmlParsingResult {
+  /**
+   * The attributes to use in the XML declaration.
+   */
+  declaration: Attributes;
+
+  /**
+   * The child nodes of the XML document.
+   */
+  nodes: XmlNode[];
+}
+
 /** Options to use when writing a node as an XML string. */
 export interface XmlFormattingOptions extends Partial<{
   /**
