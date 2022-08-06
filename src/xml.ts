@@ -25,6 +25,30 @@ interface CompleteXmlFormattingOptions extends Required<XmlFormattingOptions> {
 /** An error to throw when a PI tag is detected. */
 class UnescapedProcessingInstructionsError extends Error { }
 
+/** Options to use when reading XML from a string/buffer. */
+interface XmlParsingOptions extends Partial<{
+  /**
+   * Whether or not to ignore comments while parsing XML. If true, then comments
+   * will be entirely left out. False by default.
+   */
+  ignoreComments?: boolean;
+
+  /**
+   * Whether or not to ignore processing intructions while parsing XML. If true,
+   * then PI tags (other than the XML declaration) will be entirely left out.
+   * False by default.
+   */
+  ignoreProcessingInstructions?: boolean;
+
+  /**
+   * Whether or not nodes that share the exact same structure should be loaded
+   * once and only once. This should never be true if you intend on modifying
+   * the DOM at all, as doing so can lead to unintended side effects. False by
+   * default.
+   */
+  recycleNodes?: boolean;
+}> { }
+
 /** Options to use when writing a node as an XML string. */
 interface XmlFormattingOptions extends Partial<{
   /**
@@ -436,41 +460,14 @@ export class XmlDocumentNode extends XmlNodeBase {
    * Parses and returns either a string or a buffer containing XML code as a
    * XmlDocumentNode, if possible.
    * 
-   * Options
-   * - `allowMultipleRoots`: Whether or not the document should still be created
-   * if it will have multiple roots. If false, an exception will be thrown if
-   * there is more than one root element. (Default = false)
-   * - `ignoreComments`: Whether or not comments should be ignored. If false,
-   * comments will be parsed. (Default = false)
-   * - `ignoreProcessingInstructions`: Whether or not processing instructions
-   * should be ignored. If false, PI tags will be parsed. (Default = false)
-   * 
    * @param xml XML document to parse as a node
-   * @param options Optional object containing options
+   * @param options Object containing options
    */
-  static from(xml: string | Buffer, {
-    allowMultipleRoots = false,
-    ignoreComments = false,
-    ignoreProcessingInstructions = false,
-  }: {
-    allowMultipleRoots?: boolean;
-    ignoreComments?: boolean;
-    ignoreProcessingInstructions?: boolean;
-  } = {}): XmlDocumentNode {
-    const { nodes, declaration } =
-      parseXml(xml, !ignoreComments, !ignoreProcessingInstructions);
-
-    if (nodes.length <= 1) return new XmlDocumentNode(nodes[0], {
-      declaration
-    });
-
-    if (allowMultipleRoots) {
-      const doc = new XmlDocumentNode(null, { declaration });
-      doc.children.push(...nodes);
-      return doc;
-    } else {
-      throw new Error("XML document should only have one root node.");
-    }
+  static from(xml: string | Buffer, options?: XmlParsingOptions): XmlDocumentNode {
+    const { nodes, declaration } = parseXml(xml, options);
+    const doc = new XmlDocumentNode(undefined, { declaration });
+    doc.children.push(...nodes);
+    return doc;
   }
 
   addChildren(...children: XmlNode[]): void {
@@ -683,19 +680,17 @@ export class XmlWrapperNode extends XmlNodeBase {
  * Parses a string or buffer containing XML as a list of nodes.
  * 
  * @param xml XML document to parse as a node
- * @param parseComments Whether or not to parse comment nodes
- * @param parsePiTags Whether or not to parse PI nodes
+ * @param options Object of optional arguments
  */
 function parseXml(
   xml: string | Buffer,
-  parseComments: boolean,
-  parsePiTags: boolean,
+  options?: XmlParsingOptions
 ): {
   nodes: XmlNode[];
   declaration: Attributes;
 } {
   try {
-    const options: Partial<X2jOptions> = {
+    const x2jOptions: Partial<X2jOptions> = {
       ignoreAttributes: false,
       attributeNamePrefix: "",
       parseAttributeValue: false,
@@ -704,8 +699,8 @@ function parseXml(
       preserveOrder: true,
     };
 
-    if (parseComments) options.commentPropName = "comment";
-    const parser = new XMLParser(options);
+    if (!options?.ignoreComments) x2jOptions.commentPropName = "comment";
+    const parser = new XMLParser(x2jOptions);
 
     interface NodeObj {
       value?: number | bigint | string;
@@ -739,7 +734,7 @@ function parseXml(
             isWrapper = true;
             children = parseNodeObjArray(nodeObj[key]);
           } else if (key.startsWith("?")) {
-            if (!parsePiTags) return undefined;
+            if (options?.ignoreProcessingInstructions) return undefined;
             throw new UnescapedProcessingInstructionsError();
           } else { // guaranteed to execute once and only once
             tag = key;
@@ -770,8 +765,7 @@ function parseXml(
       if (e instanceof UnescapedProcessingInstructionsError) {
         return parseXml(
           replaceProcessingInstructions(xml),
-          parseComments,
-          false
+          options
         );
       } else {
         throw e;

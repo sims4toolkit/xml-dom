@@ -39,18 +39,6 @@ describe('XmlDocumentNode', function () {
   });
 
   describe('#from()', function () {
-    it('should throw if the given XML contains multiple nodes at the root', function () {
-      expect(() => XmlDocumentNode.from(`<T/><T/>`)).to.throw();
-    });
-
-    it('should not throw for multiple roots if told not to', function () {
-      const doc = XmlDocumentNode.from(`<T/><T/>`, {
-        allowMultipleRoots: true
-      });
-
-      expect(doc.numChildren).to.equal(2);
-    });
-
     it('should parse comments', function () {
       const doc = XmlDocumentNode.from(`<!--This is a comment-->`);
       expect(doc.numChildren).to.equal(1);

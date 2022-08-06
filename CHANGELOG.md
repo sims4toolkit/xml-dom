@@ -10,9 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `XmlWrapperNode` to parse PI tags.
 - Add `minify`, `writeComments`, and `writeProcessingInstructions` options to `XmlFormattingOptions`.
 - Add `declaration` property to XmlDocumentNode.
+- Add `recycleNodes` option to XmlDocumentNode.from() options.
 ### Changed
 - Rename `includeProcessingInstructions` option in `XmlFormattingOptions` to `writeXmlDeclaration`.
 - XML documents now preserve the XML declaration they had when parsed.
+- XML documents now allow multiple roots all the time.
+### Removed
+- Remove `allowMultipleRoots` option from XmlDocumentNode.from() options.
 
 ## [0.1.3] - 2022/02/17
 ### Changed
