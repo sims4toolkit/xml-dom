@@ -25,7 +25,10 @@
     {
       "name": "types",
       "items": [
+        "RecycledNodeRef",
+        "RecycledNodesCache",
         "XmlFormattingOptions",
+        "XmlParsingOptions",
         "XmlValue"
       ]
     }

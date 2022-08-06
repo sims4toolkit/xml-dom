@@ -1,0 +1,59 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "interface",
+      "name": "XmlParsingOptions"
+    },
+    "description": "Options to use when reading XML from a string/buffer.",
+    "sourceCode": "src/lib/types.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "name": "ignoreComments",
+          "optional": true,
+          "description": "Whether or not to ignore comments while parsing XML. If true, then comments will be entirely left out. False by default.",
+          "type": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "ignoreProcessingInstructions",
+          "optional": true,
+          "description": "Whether or not to ignore processing intructions while parsing XML. If true, then PI tags (other than the XML declaration) will be entirely left out. False by default.",
+          "type": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "recycledNodesCache",
+          "optional": true,
+          "description": "An object that is used to keep track of recycled nodes. This does not need to be provided by the user; it will be generated if recycleNodes = true.",
+          "type": {
+            "name": "RecycledNodesCache",
+            "path": {
+              "pkg": "xml-dom",
+              "group": "types",
+              "item": "RecycledNodesCache"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "recycleNodes",
+          "optional": true,
+          "description": "Whether or not nodes that share the exact same structure should be loaded once and only once. This should never be true if you intend on modifying the DOM at all, as doing so can lead to unintended side effects. False by default.",
+          "type": {
+            "name": "boolean"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
-  "imports": [
-    "import type { XmlFormattingOptions } from \"@s4tk/xml-dom\"; // TypeScript only"
-  ],
   "header": {
     "title": {
       "prefix": "interface",

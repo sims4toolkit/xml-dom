@@ -3,6 +3,7 @@ import type {
   Attributes,
   CompleteXmlFormattingOptions,
   RecycledNodeRef,
+  RecycledNodesCache,
   XmlElementFormattingOptions,
   XmlFormattingOptions,
   XmlParsingOptions,
@@ -369,17 +370,40 @@ export class XmlDocumentNode extends XmlNodeBase {
   }
 
   /**
-   * Parses and returns either a string or a buffer containing XML code as a
-   * XmlDocumentNode, if possible.
+   * Parses the given XML data as a XmlDocumentNode, if possible.
    * 
    * @param xml XML document to parse as a node
    * @param options Object containing options
    */
-  static from(xml: string | Buffer, options?: XmlParsingOptions): XmlDocumentNode {
+  static from(
+    xml: string | Buffer,
+    options?: XmlParsingOptions
+  ): XmlDocumentNode {
     const { nodes, declaration } = parseXml(xml, options);
     const doc = new XmlDocumentNode(undefined, { declaration });
     doc.children.push(...nodes);
     return doc;
+  }
+
+  /**
+   * Parses the given XML data as a XmlDocumentNode, reusing nodes that share
+   * the same structure, and returns the document with the built cache.
+   * 
+   * @param xml XML document to parse as a node
+   * @param options Object containing options
+   */
+  static fromRecycled(
+    xml: string | Buffer,
+    options: Omit<XmlParsingOptions, "recycleNodes"> = {}
+  ): {
+    doc: XmlDocumentNode,
+    recylingCache: RecycledNodesCache
+  } {
+    (options as XmlParsingOptions).recycleNodes = true;
+    const { nodes, declaration, recylingCache } = parseXml(xml, options);
+    const doc = new XmlDocumentNode(undefined, { declaration });
+    doc.children.push(...nodes);
+    return { doc, recylingCache };
   }
 
   addChildren(...children: XmlNode[]): void {
@@ -702,13 +726,14 @@ function parseXml(
         if (attrKey !== "n")
           attrSegments.push(`${attrKey}=${attributes[attrKey]}`);
       }
+      attrSegments.sort();
       if (attrSegments.length) keySegments.push(attrSegments.join(","));
 
       if (children.length) keySegments.push(children.map(child => {
         const childRef = nodeCache.refMap.get(child);
         childRef.refs++;
         return childRef.id;
-      }).join(","));
+      }).sort((a, b) => a - b).join(","));
 
       const primaryKey = keySegments.join("&");
 
@@ -744,7 +769,7 @@ function parseXml(
         const childRef = nodeCache.refMap.get(child);
         childRef.refs++;
         return childRef.id;
-      }).join(",");
+      }).sort((a, b) => a - b).join(",");
 
       const key = childIds ? tag : `${tag}&${childIds}`;
 

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "interface",
+      "name": "RecycledNodesCache"
+    },
+    "description": "Object containing recyled nodes.",
+    "sourceCode": "src/lib/types.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "description": "More detailed information about the map keys can be found in the source code / intellisense.",
+      "content": [
+        {
+          "displayType": "property",
+          "name": "comments",
+          "description": "Mapping of comment nodes.",
+          "type": {
+            "name": "Map<string, RecycledNodeRef<XmlCommentNode>>"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "elements",
+          "description": "Mapping of element nodes.",
+          "type": {
+            "name": "Map<string, Map<string, RecycledNodeRef<XmlElementNode>>>"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "refMap",
+          "description": "A redundant mapping of all nodes to their ref objects.",
+          "type": {
+            "name": "Map<XmlNode, RecycledNodeRef<XmlNode>>"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "nextId",
+          "description": "The unique ID to use for the next node.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "values",
+          "description": "Mapping of value nodes.",
+          "type": {
+            "name": "Map<string, RecycledNodeRef<XmlValueNode>>"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "wrappers",
+          "description": "Mapping of wrapper nodes.",
+          "type": {
+            "name": "Map<string, RecycledNodeRef<XmlWrapperNode>>"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "seeAlso": [
+      {
+        "name": "RecycledNodeRef",
+        "path": {
+          "pkg": "xml-dom",
+          "group": "types",
+          "item": "RecycledNodeRef"
+        }
+      },
+      {
+        "name": "XmlNode",
+        "path": {
+          "pkg": "xml-dom",
+          "group": "interfaces",
+          "item": "XmlNode"
+        }
+      }
+    ]
+  }
+}

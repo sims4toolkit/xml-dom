@@ -92,7 +92,7 @@ export interface RecycledNodesCache {
    * - `<?ignore ... ?>` w/ id 5  => `"ignore&5"`
    * - `<?ignore ... ?>` w/ ids 5 + 10  => `"ignore&5,10"`
    */
-  wrappers: Map<string, RecycledNodeRef<XmlWrapperNode>>
+  wrappers: Map<string, RecycledNodeRef<XmlWrapperNode>>;
 }
 
 /** Options to use when reading XML from a string/buffer. */
@@ -130,7 +130,7 @@ export interface XmlParsingResult {
   /**
    * The attributes to use in the XML declaration.
    */
-  declaration: Attributes;
+  declaration?: Attributes;
 
   /**
    * The child nodes of the XML document.
