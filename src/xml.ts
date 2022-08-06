@@ -1,6 +1,6 @@
 import { X2jOptions, XMLParser } from "fast-xml-parser";
 
-//#region Types & Constants
+//#region Constants
 
 const PI_NODE_TAG = "__PI_NODE";
 
@@ -10,13 +10,20 @@ const DEFAULT_XML_DECLARATION = () => ({
   encoding: "utf-8"
 });
 
-class UnescapedProcessingInstructionsError extends Error { }
+//#endregion Constants
+
+//#region Types
 
 /** Generic interface that can support any attributes. */
 type Attributes = { [key: string]: any; };
 
-/** Types that may appear in a value node. */
-type XmlValue = number | bigint | boolean | string;
+/** Non-optional version of XmlFormattingOptions. */
+interface CompleteXmlFormattingOptions extends Required<XmlFormattingOptions> {
+  __isComplete: true;
+}
+
+/** An error to throw when a PI tag is detected. */
+class UnescapedProcessingInstructionsError extends Error { }
 
 /** Options to use when writing a node as an XML string. */
 interface XmlFormattingOptions extends Partial<{
@@ -56,22 +63,20 @@ interface XmlFormattingOptions extends Partial<{
    * applicable to document nodes. (Default = true)
    */
   writeXmlDeclaration: boolean;
-}> { };
+}> { }
 
 /** Options to use when writing an element node as an XML string. */
 type XmlElementFormattingOptions =
   Omit<XmlFormattingOptions, "writeXmlDeclaration">;
 
+/** Types that may appear in a value node. */
+type XmlValue = number | bigint | boolean | string;
+
 /** Options to use when writing a childless node as an XML string. */
 type XmlValueFormattingOptions =
   Omit<XmlElementFormattingOptions, "writeProcessingInstructions">;
 
-/** Non-optional version of XmlFormattingOptions. */
-interface CompleteXmlFormattingOptions extends Required<XmlFormattingOptions> {
-  __isComplete: true;
-};
-
-//#endregion Types & Constants
+//#endregion Types
 
 //#region Models
 
