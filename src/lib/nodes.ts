@@ -619,13 +619,15 @@ function parseXml(
     if (!options?.ignoreComments) x2jOptions.commentPropName = "comment";
     const parser = new XMLParser(x2jOptions);
 
-    if (options?.recycleNodes) options.recycledNodesCache = {
-      comments: new Map(),
-      elements: new Map(),
-      idMap: new Map(),
-      values: new Map(),
-      wrappers: new Map()
-    };
+    if (options?.recycleNodes && !options.recycledNodesCache) {
+      options.recycledNodesCache = {
+        comments: new Map(),
+        elements: new Map(),
+        idMap: new Map(),
+        values: new Map(),
+        wrappers: new Map()
+      };
+    }
 
     interface X2jNodeObj {
       value?: number | bigint | string;
