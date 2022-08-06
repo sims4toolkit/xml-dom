@@ -17,11 +17,24 @@ describe('XmlDocumentNode', function () {
     });
 
     it("should use the XML declaration that is provided", () => {
-      // TODO:
+      const doc = new XmlDocumentNode(undefined, {
+        declaration: {
+          version: "2.0",
+          something: "idk"
+        }
+      });
+
+      expect(doc.declaration).to.be.an("Object");
+      expect(doc.declaration.version).to.equal("2.0");
+      expect(doc.declaration.something).to.equal("idk");
+      expect(doc.declaration.encoding).to.be.undefined;
     });
 
     it("should use the default XML declaration if there isn't one", () => {
-      // TODO:
+      const doc = new XmlDocumentNode();
+      expect(doc.declaration).to.be.an("Object");
+      expect(doc.declaration.version).to.equal("1.0");
+      expect(doc.declaration.encoding).to.equal("utf-8");
     });
   });
 
@@ -432,15 +445,16 @@ describe('XmlDocumentNode', function () {
 
   describe("#declaration", () => {
     it("should throw when assigned", () => {
-      // TODO:
-    });
-
-    it("should return the declaration", () => {
-      // TODO:
+      const doc = new XmlDocumentNode();
+      //@ts-expect-error
+      expect(() => doc.declaration = {}).to.throw();
     });
 
     it("should mutate the declaration", () => {
-      // TODO:
+      const doc = new XmlDocumentNode();
+      expect(doc.declaration.version).to.equal("1.0");
+      doc.declaration.version = "2.0";
+      expect(doc.declaration.version).to.equal("2.0");
     });
   });
 
@@ -991,7 +1005,7 @@ describe('XmlDocumentNode', function () {
 
       const doc = new XmlDocumentNode(root);
 
-      expect(doc.toXml({ writeComments: false })).to.equal(`${XML_DECLARATION}<L n="some_list">
+      expect(doc.toXml({ writeComments: false })).to.equal(`${XML_DECLARATION}\n<L n="some_list">
   <T>12345</T>
 </L>`);
     });
