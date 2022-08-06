@@ -22,6 +22,77 @@ interface CompleteXmlFormattingOptions extends Required<XmlFormattingOptions> {
   __isComplete: true;
 }
 
+/** An object that references a specific recycled node. */
+interface RecycledNodeRef<T extends XmlNode> {
+  ref: number;
+  node: T;
+}
+
+/** Object containing recyled nodes. */
+interface RecycledNodesCache {
+  /**
+   * Mapping of comment nodes.
+   * 
+   * ### Key
+   * The content of the node, exactly as it appears in XML.
+   * 
+   * Example:
+   * - `<!--Something-->` => `"Something"`
+   */
+  comments: Map<string, RecycledNodeRef<XmlCommentNode>>;
+
+  /**
+   * Mapping of element nodes.
+   * 
+   * ### First Key
+   * The concatenation of this node's tag, attributes (except for `n`), and
+   * child refs. Attribute key/values are joined with "=", attributes are sorted
+   * by key and then joined with ",", and child refs are sorted and joined with
+   * ",". The tag, attributes, and child refs are then joined with "&".
+   * 
+   * Examples:
+   * - `<V n="name" t="type"/>` => `"V&t=type"`
+   * - `<I s="12345" c="class" />` => `"I&c=class,s=12345"`
+   * - `<V t="type"> ... </V>` w/ ref 5 => `"V&t=type&5"`
+   * - `<L> ... </L>` w/ refs 5 + 10 => `"L&5,10"`
+   * 
+   * ### Second Key
+   * The name (`n` attribute), if there is one. If the element does not have a
+   * name, then an empty string is used.
+   * 
+   * Examples:
+   * - `<V n="name" t="type"/>` => `"name"`
+   * - `<V t="type" />` => `""`
+   */
+  elements: Map<string, Map<string, RecycledNodeRef<XmlElementNode>>>;
+
+  /**
+   * Mapping of value nodes.
+   * 
+   * ### Key
+   * The string value of the node, exactly as it appears in XML.
+   * 
+   * Examples:
+   * - `Something` => `"Something"`
+   * - `12345` => `"12345"`
+   */
+  values: Map<string, RecycledNodeRef<XmlValueNode>>;
+
+  /**
+   * Mapping of wrapper nodes.
+   * 
+   * ### Key
+   * The concatenation of this node's tag and its child refs. The child refs
+   * are sorted and then joined with ",". The tag and refs are joined by "&".
+   * 
+   * Examples:
+   * - `<?ignore?>` => `"ignore"`
+   * - `<?ignore ... ?>` w/ ref 5  => `"ignore&5"`
+   * - `<?ignore ... ?>` w/ refs 5 + 10  => `"ignore&5,10"`
+   */
+  wrappers: Map<string, RecycledNodeRef<XmlWrapperNode>>
+}
+
 /** An error to throw when a PI tag is detected. */
 class UnescapedProcessingInstructionsError extends Error { }
 
@@ -39,6 +110,12 @@ interface XmlParsingOptions extends Partial<{
    * False by default.
    */
   ignoreProcessingInstructions: boolean;
+
+  /**
+   * An object that is used to keep track of recycled nodes. This does not need
+   * to be provided by the user; it will be generated if `recycleNodes = true`.
+   */
+  recycledNodesCache: RecycledNodesCache;
 
   /**
    * Whether or not nodes that share the exact same structure should be loaded
@@ -483,7 +560,10 @@ export class XmlDocumentNode extends XmlNodeBase {
   }
 
   clone(): XmlDocumentNode {
-    return new XmlDocumentNode(...(this.children.map(child => child.clone())));
+    const declaration = Object.assign({}, this.declaration);
+    const clone = new XmlDocumentNode(null, { declaration });
+    clone.addClones(...this.children);
+    return clone;
   }
 
   toXml(options: XmlFormattingOptions = {}): string {
