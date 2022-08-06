@@ -458,9 +458,10 @@ export class XmlDocumentNode extends XmlNodeBase {
     this.children.forEach(child => {
       if (writeProcessingInstructions || !(child instanceof XmlWrapperNode))
         lines.push(child.toXml({
-          writeProcessingInstructions,
           indents,
-          spacesPerIndent
+          minify,
+          spacesPerIndent,
+          writeProcessingInstructions,
         }));
     });
 
@@ -534,9 +535,11 @@ export class XmlElementNode extends XmlNodeBase {
         lines.push(`${spaces}<${this.tag}${attrString}>${value}</${this.tag}>`);
       } else {
         lines.push(`${spaces}<${this.tag}${attrString}>`);
+        const childIndents = minify ? indents : indents + 1;
         this.children.forEach(child => {
           if (shouldWriteChild(child)) lines.push(child.toXml({
-            indents: minify ? indents : indents + 1,
+            indents: childIndents,
+            minify,
             spacesPerIndent,
             writeProcessingInstructions
           }));
@@ -545,7 +548,7 @@ export class XmlElementNode extends XmlNodeBase {
       }
     }
 
-    return lines.join('\n');
+    return lines.join(minify ? "" : "\n");
   }
 }
 
@@ -641,13 +644,20 @@ export class XmlWrapperNode extends XmlNodeBase {
       lines.push(`${spaces}<?${this.tag} ${value} ?>`);
     } else {
       lines.push(`${spaces}<?${this.tag}`);
+      if (minify) lines.push(" ");
+      const childIndents = minify ? indents : indents + 1;
       this.children.forEach(child => {
-        lines.push(child.toXml({ indents: indents + 1, spacesPerIndent }));
+        lines.push(child.toXml({
+          indents: childIndents,
+          minify,
+          spacesPerIndent
+        }));
       });
+      if (minify) lines.push(" ");
       lines.push(`${spaces}?>`);
     }
 
-    return lines.join('\n');
+    return lines.join(minify ? "" : "\n");
   }
 }
 
