@@ -24,8 +24,14 @@ interface CompleteXmlFormattingOptions extends Required<XmlFormattingOptions> {
 
 /** An object that references a specific recycled node. */
 interface RecycledNodeRef<T extends XmlNode> {
-  ref: number;
+  /** The globally unique ID for this node. */
+  id: number;
+
+  /** The actual node object. */
   node: T;
+
+  /** The number of references there are to this node. */
+  refs: number;
 }
 
 /** Object containing recyled nodes. */
@@ -53,8 +59,8 @@ interface RecycledNodesCache {
    * Examples:
    * - `<V n="name" t="type"/>` => `"V&t=type"`
    * - `<I s="12345" c="class" />` => `"I&c=class,s=12345"`
-   * - `<V t="type"> ... </V>` w/ ref 5 => `"V&t=type&5"`
-   * - `<L> ... </L>` w/ refs 5 + 10 => `"L&5,10"`
+   * - `<V t="type"> ... </V>` w/ id 5 => `"V&t=type&5"`
+   * - `<L> ... </L>` w/ ids 5 + 10 => `"L&5,10"`
    * 
    * ### Second Key
    * The name (`n` attribute), if there is one. If the element does not have a
@@ -65,6 +71,11 @@ interface RecycledNodesCache {
    * - `<V t="type" />` => `""`
    */
   elements: Map<string, Map<string, RecycledNodeRef<XmlElementNode>>>;
+
+  /**
+   * A redundant mapping of all IDs to the nodes they belong to.
+   */
+  idMap: Map<number, RecycledNodeRef<XmlNode>>;
 
   /**
    * Mapping of value nodes.
@@ -87,8 +98,8 @@ interface RecycledNodesCache {
    * 
    * Examples:
    * - `<?ignore?>` => `"ignore"`
-   * - `<?ignore ... ?>` w/ ref 5  => `"ignore&5"`
-   * - `<?ignore ... ?>` w/ refs 5 + 10  => `"ignore&5,10"`
+   * - `<?ignore ... ?>` w/ id 5  => `"ignore&5"`
+   * - `<?ignore ... ?>` w/ ids 5 + 10  => `"ignore&5,10"`
    */
   wrappers: Map<string, RecycledNodeRef<XmlWrapperNode>>
 }
