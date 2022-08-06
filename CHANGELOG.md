@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Properly parse processing instruction nodes as XML wrappers.
 ### Fixed
 - TODO:
+### Changed
+- Rename `includeProcessingInstructions` option in `XmlFormattingOptions` to `writeXmlDeclaration`.
+- Add `writeProcessingInstructions`option to `XmlFormattingOptions`.
 
 ## [0.1.3] - 2022/02/17
 ### Changed

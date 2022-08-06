@@ -301,7 +301,7 @@ describe('XmlDocumentNode', function () {
         const doc = XmlDocumentNode.from(xml);
         expect(doc.child.numChildren).to.equal(3);
         expect(doc.child.child.numChildren).to.equal(1);
-        expect(doc.toXml()).to.equal(xml);
+        expect(doc.toXml({ writeXmlDeclaration: false })).to.equal(xml);
       });
 
       it("should ignore opening PI tag that is in a nested comment", () => {
@@ -316,7 +316,7 @@ describe('XmlDocumentNode', function () {
         const doc = XmlDocumentNode.from(xml);
         expect(doc.child.numChildren).to.equal(2);
         expect(doc.child.child.numChildren).to.equal(2);
-        expect(doc.toXml()).to.equal(xml);
+        expect(doc.toXml({ writeXmlDeclaration: false })).to.equal(xml);
       });
 
       it("should ignore opening PI tag that is in a string", () => {
@@ -330,7 +330,7 @@ describe('XmlDocumentNode', function () {
         const doc = XmlDocumentNode.from(xml);
         expect(doc.child.numChildren).to.equal(2);
         expect(doc.child.child.numChildren).to.equal(1);
-        expect(doc.toXml()).to.equal(xml);
+        expect(doc.toXml({ writeXmlDeclaration: false })).to.equal(xml);
       });
 
       it("should ignore opening PI tag that is in a nested string", () => {
@@ -344,7 +344,8 @@ describe('XmlDocumentNode', function () {
         const doc = XmlDocumentNode.from(xml);
         expect(doc.child.numChildren).to.equal(2);
         expect(doc.child.child.numChildren).to.equal(1);
-        expect(doc.toXml()).to.equal(xml);
+        expect(doc.child.child.child.name).to.equal("<?ignore");
+        expect(doc.toXml({ writeXmlDeclaration: false })).to.equal(xml);
       });
     });
   });
@@ -793,12 +794,12 @@ describe('XmlDocumentNode', function () {
 
     it('should use the XML declaration if given true', function () {
       const node = newNode();
-      expect(node.toXml({ includeProcessingInstructions: true })).to.equal(XML_DECLARATION);
+      expect(node.toXml({ writeXmlDeclaration: true })).to.equal(XML_DECLARATION);
     });
 
     it('should not use the XML declaration if given false', function () {
       const node = newNode();
-      expect(node.toXml({ includeProcessingInstructions: false })).to.equal("");
+      expect(node.toXml({ writeXmlDeclaration: false })).to.equal("");
     });
 
     it('should not indent if the given number is 0', function () {

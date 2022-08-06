@@ -16,12 +16,6 @@ type XmlValue = number | bigint | boolean | string;
  */
 interface XmlFormattingOptions {
   /**
-   * Whether or not to include the XML processing instruction tag at the top of
-   * this output. Only applicable to document nodes. (Default = true)
-   */
-  includeProcessingInstructions?: boolean;
-
-  /**
    * Number of times to indent this node. This will increase by 1 for each
    * recursive call. (Default = 0)
    */
@@ -31,6 +25,18 @@ interface XmlFormattingOptions {
    * Number of spaces to use per indent. (Default = 2)
    */
   spacesPerIndent?: number;
+
+  /**
+   * Whether or not to include any XML processing instructions other than the
+   * XML declaration at the top of the file. (Default = true)
+   */
+  writeProcessingInstructions?: boolean;
+
+  /**
+   * Whether or not to include the XML declaration at the top of the file. Only
+   * applicable to document nodes. (Default = true)
+   */
+  writeXmlDeclaration?: boolean;
 }
 
 //#endregion Types
@@ -428,17 +434,23 @@ export class XmlDocumentNode extends XmlNodeBase {
   }
 
   toXml({
-    includeProcessingInstructions = true,
     indents = 0,
-    spacesPerIndent = 2
+    spacesPerIndent = 2,
+    writeProcessingInstructions = true,
+    writeXmlDeclaration = true
   }: XmlFormattingOptions = {}): string {
     const spaces = " ".repeat(indents * spacesPerIndent);
     const lines: string[] = [];
-    if (includeProcessingInstructions)
+    if (writeXmlDeclaration)
       lines.push(`${spaces}${XML_DECLARATION}`);
 
     this.children.forEach(child => {
-      lines.push(child.toXml({ indents, spacesPerIndent }));
+      if (writeProcessingInstructions || !(child instanceof XmlWrapperNode))
+        lines.push(child.toXml({
+          writeProcessingInstructions,
+          indents,
+          spacesPerIndent
+        }));
     });
 
     return lines.join('\n');
@@ -474,12 +486,20 @@ export class XmlElementNode extends XmlNodeBase {
     });
   }
 
-  toXml({ indents = 0, spacesPerIndent = 2 }: {
+  toXml({
+    indents = 0,
+    spacesPerIndent = 2,
+    writeProcessingInstructions = true
+  }: {
+    writeProcessingInstructions?: boolean;
     indents?: number;
     spacesPerIndent?: number;
   } = {}): string {
     const spaces = " ".repeat(indents * spacesPerIndent);
     const lines: string[] = [];
+
+    const shouldWriteChild = (child: XmlNode) =>
+      (writeProcessingInstructions || !(child instanceof XmlWrapperNode));
 
     // attributes
     const attrKeys = Object.keys(this.attributes);
@@ -497,12 +517,17 @@ export class XmlElementNode extends XmlNodeBase {
     if (this.numChildren === 0) {
       lines.push(`${spaces}<${this.tag}${attrString}/>`);
     } else if (this.numChildren <= 2 && !this.child.hasChildren) {
-      const value = this.children.map(child => child.toXml()).join('');
+      const value = this.children.map(child => {
+        return shouldWriteChild(child)
+          ? child.toXml()
+          : "";
+      }).join('');
       lines.push(`${spaces}<${this.tag}${attrString}>${value}</${this.tag}>`);
     } else {
       lines.push(`${spaces}<${this.tag}${attrString}>`);
       this.children.forEach(child => {
-        lines.push(child.toXml({ indents: indents + 1, spacesPerIndent }));
+        if (shouldWriteChild(child))
+          lines.push(child.toXml({ indents: indents + 1, spacesPerIndent }));
       });
       lines.push(`${spaces}</${this.tag}>`);
     }
@@ -731,7 +756,6 @@ function parseXml(
  * @param xml XML content to replace all PI tags in
  */
 function replaceProcessingInstructions(xml: string | Buffer): string {
-  // FIXME: Known bug when "<?" or "?>" appears in a comment or string
   const piSpanRegex = /<\?\s*[^(xml)](?:(?!\?>).)*\?>/gis;
   const piOpenTagRegex = /^<\?\s*\S*/;
   const piCloseTagRegex = /\?>$/;
