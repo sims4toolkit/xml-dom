@@ -20,7 +20,7 @@
       ]
     },
     "description": "A node for an XML comment (<!--Like this-->). This node can have a value, and cannot have children.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/nodes.ts"
   },
   "sections": [
     {

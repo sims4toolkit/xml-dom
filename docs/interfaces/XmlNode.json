@@ -9,7 +9,7 @@
       "name": "XmlNode"
     },
     "description": "A node in an XML document model.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/nodes.ts"
   },
   "sections": [
     {

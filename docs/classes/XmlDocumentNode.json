@@ -20,7 +20,7 @@
       ]
     },
     "description": "A node for an XML document that can have children. Tuning documents should always have one child and one child only, but multiple children are supported.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/nodes.ts"
   },
   "sections": [
     {

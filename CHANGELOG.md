@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `minify`, `writeComments`, and `writeProcessingInstructions` options to `XmlFormattingOptions`.
 - Add `declaration` property to XmlDocumentNode.
 - Add `recycleNodes` option to XmlDocumentNode.from() options.
+- Add cell recycling for use with combined tuning.
 ### Changed
 - Rename `includeProcessingInstructions` option in `XmlFormattingOptions` to `writeXmlDeclaration`.
 - XML documents now preserve the XML declaration they had when parsed.

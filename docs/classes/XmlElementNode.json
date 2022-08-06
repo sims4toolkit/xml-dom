@@ -20,7 +20,7 @@
       ]
     },
     "description": "A node for an XML element that has a tag, attributes, and children.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/nodes.ts"
   },
   "sections": [
     {

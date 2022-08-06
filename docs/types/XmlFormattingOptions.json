@@ -9,7 +9,7 @@
       "name": "XmlFormattingOptions"
     },
     "description": "Options to use when writing a node as an XML string.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/types.ts"
   },
   "sections": [
     {

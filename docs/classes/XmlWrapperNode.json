@@ -20,7 +20,7 @@
       ]
     },
     "description": "A processing instruction node that contains other XML.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/nodes.ts"
   },
   "sections": [
     {
