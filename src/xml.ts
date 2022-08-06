@@ -31,14 +31,14 @@ interface XmlParsingOptions extends Partial<{
    * Whether or not to ignore comments while parsing XML. If true, then comments
    * will be entirely left out. False by default.
    */
-  ignoreComments?: boolean;
+  ignoreComments: boolean;
 
   /**
    * Whether or not to ignore processing intructions while parsing XML. If true,
    * then PI tags (other than the XML declaration) will be entirely left out.
    * False by default.
    */
-  ignoreProcessingInstructions?: boolean;
+  ignoreProcessingInstructions: boolean;
 
   /**
    * Whether or not nodes that share the exact same structure should be loaded
@@ -46,7 +46,7 @@ interface XmlParsingOptions extends Partial<{
    * the DOM at all, as doing so can lead to unintended side effects. False by
    * default.
    */
-  recycleNodes?: boolean;
+  recycleNodes: boolean;
 }> { }
 
 /** Options to use when writing a node as an XML string. */
