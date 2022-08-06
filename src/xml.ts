@@ -442,6 +442,8 @@ export class XmlDocumentNode extends XmlNodeBase {
    * there is more than one root element. (Default = false)
    * - `ignoreComments`: Whether or not comments should be ignored. If false,
    * comments will be parsed. (Default = false)
+   * - `ignoreProcessingInstructions`: Whether or not processing instructions
+   * should be ignored. If false, PI tags will be parsed. (Default = false)
    * 
    * @param xml XML document to parse as a node
    * @param options Optional object containing options
