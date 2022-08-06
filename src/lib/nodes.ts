@@ -1,5 +1,13 @@
 import { X2jOptions, XMLParser } from "fast-xml-parser";
-import type { Attributes, CompleteXmlFormattingOptions, XmlElementFormattingOptions, XmlFormattingOptions, XmlParsingOptions, XmlValue, XmlValueFormattingOptions } from "./types";
+import type {
+  Attributes,
+  CompleteXmlFormattingOptions,
+  XmlElementFormattingOptions,
+  XmlFormattingOptions,
+  XmlParsingOptions,
+  XmlValue,
+  XmlValueFormattingOptions
+} from "./types";
 
 //#region Models
 
