@@ -683,8 +683,9 @@ function parseXml(
 
     try {
       return {
+        declaration,
         nodes: parseNodeObjArray(nodeObjs),
-        declaration
+        recylingCache: options?.recycledNodesCache
       };
     } catch (e) {
       if (e instanceof UnescapedProcessingInstructionsError) {
