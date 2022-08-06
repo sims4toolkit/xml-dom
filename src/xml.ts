@@ -11,33 +11,46 @@ type Attributes = { [key: string]: any; };
 /** Types that may appear in a value node. */
 type XmlValue = number | bigint | boolean | string;
 
-/**
- * Options to use when writing a node as an XML string.
- */
-interface XmlFormattingOptions {
+/** Options to use when writing a node as an XML string. */
+interface XmlFormattingOptions extends Partial<{
   /**
    * Number of times to indent this node. This will increase by 1 for each
-   * recursive call. (Default = 0)
+   * recursive call, unless minify = true. (Default = 0)
    */
-  indents?: number;
+  indents: number;
+
+  /**
+   * Whether or not the output XML should be minified (i.e. have all of its
+   * unneeded whitespace removed). If true, then `indents` and `spacesPerIndent`
+   * will be ignored, and the output will appear on one line. (Default = false)
+   */
+  minify: boolean;
 
   /**
    * Number of spaces to use per indent. (Default = 2)
    */
-  spacesPerIndent?: number;
+  spacesPerIndent: number;
 
   /**
    * Whether or not to include any XML processing instructions other than the
    * XML declaration at the top of the file. (Default = true)
    */
-  writeProcessingInstructions?: boolean;
+  writeProcessingInstructions: boolean;
 
   /**
    * Whether or not to include the XML declaration at the top of the file. Only
    * applicable to document nodes. (Default = true)
    */
-  writeXmlDeclaration?: boolean;
-}
+  writeXmlDeclaration: boolean;
+}> { };
+
+/** Options to use when writing an element node as an XML string. */
+type XmlElementFormattingOptions =
+  Omit<XmlFormattingOptions, "writeXmlDeclaration">;
+
+/** Options to use when writing a childless node as an XML string. */
+type XmlValueFormattingOptions =
+  Omit<XmlElementFormattingOptions, "writeProcessingInstructions">;
 
 //#endregion Types
 
@@ -348,10 +361,7 @@ abstract class XmlNodeBase implements XmlNode {
     }));
   }
 
-  abstract toXml(options?: {
-    indents?: number;
-    spacesPerIndent?: number;
-  }): string;
+  abstract toXml(options?: XmlFormattingOptions): string;
 
   //#endregion Methods
 
@@ -435,11 +445,12 @@ export class XmlDocumentNode extends XmlNodeBase {
 
   toXml({
     indents = 0,
+    minify = false,
     spacesPerIndent = 2,
     writeProcessingInstructions = true,
     writeXmlDeclaration = true
   }: XmlFormattingOptions = {}): string {
-    const spaces = " ".repeat(indents * spacesPerIndent);
+    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
     const lines: string[] = [];
     if (writeXmlDeclaration)
       lines.push(`${spaces}${XML_DECLARATION}`);
@@ -488,14 +499,11 @@ export class XmlElementNode extends XmlNodeBase {
 
   toXml({
     indents = 0,
+    minify = false,
     spacesPerIndent = 2,
     writeProcessingInstructions = true
-  }: {
-    writeProcessingInstructions?: boolean;
-    indents?: number;
-    spacesPerIndent?: number;
-  } = {}): string {
-    const spaces = " ".repeat(indents * spacesPerIndent);
+  }: XmlElementFormattingOptions = {}): string {
+    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
     const lines: string[] = [];
 
     // attributes
@@ -528,7 +536,7 @@ export class XmlElementNode extends XmlNodeBase {
         lines.push(`${spaces}<${this.tag}${attrString}>`);
         this.children.forEach(child => {
           if (shouldWriteChild(child)) lines.push(child.toXml({
-            indents: indents + 1,
+            indents: minify ? indents : indents + 1,
             spacesPerIndent,
             writeProcessingInstructions
           }));
@@ -556,12 +564,13 @@ export class XmlValueNode extends XmlNodeBase {
     return new XmlValueNode(this.value);
   }
 
-  toXml({ indents = 0, spacesPerIndent = 2 }: {
-    indents?: number;
-    spacesPerIndent?: number;
-  } = {}): string {
+  toXml({
+    indents = 0,
+    minify = false,
+    spacesPerIndent = 2,
+  }: XmlValueFormattingOptions = {}): string {
     if (this.value == undefined) return '';
-    const spaces = " ".repeat(indents * spacesPerIndent);
+    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
     return `${spaces}${formatValue(this.value)}`;
   }
 }
@@ -576,11 +585,12 @@ export class XmlCommentNode extends XmlNodeBase {
     return new XmlCommentNode(this.value as string);
   }
 
-  toXml({ indents = 0, spacesPerIndent = 2 }: {
-    indents?: number;
-    spacesPerIndent?: number;
-  } = {}): string {
-    const spaces = " ".repeat(indents * spacesPerIndent);
+  toXml({
+    indents = 0,
+    minify = false,
+    spacesPerIndent = 2
+  }: XmlValueFormattingOptions = {}): string {
+    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
     const comment = this.value == undefined ? '' : formatValue(this.value);
     return `${spaces}<!--${comment}-->`;
   }
@@ -615,11 +625,12 @@ export class XmlWrapperNode extends XmlNodeBase {
     });
   }
 
-  toXml({ indents = 0, spacesPerIndent = 2 }: {
-    indents?: number;
-    spacesPerIndent?: number;
-  } = {}): string {
-    const spaces = " ".repeat(indents * spacesPerIndent);
+  toXml({
+    indents = 0,
+    minify = false,
+    spacesPerIndent = 2
+  }: XmlValueFormattingOptions = {}): string {
+    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
     const lines: string[] = [];
 
     // tags & children

@@ -19,9 +19,18 @@
           "displayType": "property",
           "name": "indents",
           "optional": true,
-          "description": "Number of times to indent this node. This will increase by 1 for each recursive call. (Default = 0)",
+          "description": "Number of times to indent this node. This will increase by 1 for each recursive call, unless minify = true. (Default = 0)",
           "type": {
             "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "minify",
+          "optional": true,
+          "description": "Whether or not the output XML should be minified (i.e. have all of its unneeded whitespace removed). If true, then indents and spacesPerIndent will be ignored, and the output will appear on one line. (Default = false)",
+          "type": {
+            "name": "boolean"
           }
         },
         {
