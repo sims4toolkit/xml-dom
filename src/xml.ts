@@ -678,23 +678,6 @@ export class XmlWrapperNode extends XmlNodeBase {
 //#region Helpers
 
 /**
- * Formats a value that may appear in XML as a string.
- * 
- * @param value Value to format for XML
- */
-function formatValue(value: number | bigint | boolean | string): string {
-  switch (typeof value) {
-    case 'boolean':
-      return value ? 'True' : 'False';
-    case 'number':
-    case 'bigint':
-      return value.toString();
-    default:
-      return value;
-  }
-}
-
-/**
  * Parses a string or buffer containing XML as a list of nodes.
  * 
  * @param xml XML document to parse as a node
@@ -794,6 +777,23 @@ function parseXml(
     }
   } catch (e) {
     throw new Error(`Could not parse XML as DOM: ${e}`);
+  }
+}
+
+/**
+ * Formats a value that may appear in XML as a string.
+ * 
+ * @param value Value to format for XML
+ */
+function formatValue(value: number | bigint | boolean | string): string {
+  switch (typeof value) {
+    case 'boolean':
+      return value ? 'True' : 'False';
+    case 'number':
+    case 'bigint':
+      return value.toString();
+    default:
+      return value;
   }
 }
 
