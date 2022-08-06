@@ -44,9 +44,18 @@
         },
         {
           "displayType": "property",
+          "name": "writeComments",
+          "optional": true,
+          "description": "Whether or not to include comments. It is recommended to set this to false when minify = true. (Default = true)",
+          "type": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
           "name": "writeProcessingInstructions",
           "optional": true,
-          "description": "Whether or not to include any XML processing instructions other than the XML declaration at the top of the file. (Default = true)",
+          "description": "Whether or not to include any XML processing instructions other than the XML declaration at the top of the file. It is recommended to set this to false when minify = true. (Default = true)",
           "type": {
             "name": "boolean"
           }

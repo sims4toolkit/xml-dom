@@ -1,12 +1,16 @@
 import { X2jOptions, XMLParser } from "fast-xml-parser";
 
-//#region Types
+//#region Types & Constants
+
+const PI_NODE_TAG = "__PI_NODE";
 
 /** The line that appears at the top of XML files. */
 const DEFAULT_XML_DECLARATION = () => ({
   version: "1.0",
   encoding: "utf-8"
 });
+
+class UnescapedProcessingInstructionsError extends Error { }
 
 /** Generic interface that can support any attributes. */
 type Attributes = { [key: string]: any; };
@@ -35,15 +39,15 @@ interface XmlFormattingOptions extends Partial<{
   spacesPerIndent: number;
 
   /**
-   * Whether or not to include comments. If minifying, this option is ignored.
-   * (Default = true)
+   * Whether or not to include comments. It is recommended to set this to false
+   * when minify = true. (Default = true)
    */
-  // writeComments: boolean;
+  writeComments: boolean;
 
   /**
    * Whether or not to include any XML processing instructions other than the
-   * XML declaration at the top of the file. If minifying, this option is
-   * ignored. (Default = true)
+   * XML declaration at the top of the file. It is recommended to set this to
+   * false when minify = true. (Default = true)
    */
   writeProcessingInstructions: boolean;
 
@@ -62,7 +66,12 @@ type XmlElementFormattingOptions =
 type XmlValueFormattingOptions =
   Omit<XmlElementFormattingOptions, "writeProcessingInstructions">;
 
-//#endregion Types
+/** Non-optional version of XmlFormattingOptions. */
+interface CompleteXmlFormattingOptions extends Required<XmlFormattingOptions> {
+  __isComplete: true;
+};
+
+//#endregion Types & Constants
 
 //#region Models
 
@@ -473,30 +482,20 @@ export class XmlDocumentNode extends XmlNodeBase {
     return new XmlDocumentNode(...(this.children.map(child => child.clone())));
   }
 
-  toXml({
-    indents = 0,
-    minify = false,
-    spacesPerIndent = 2,
-    // writeComments = true,
-    writeProcessingInstructions = true,
-    writeXmlDeclaration = true
-  }: XmlFormattingOptions = {}): string {
-    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
+  toXml(options: XmlFormattingOptions = {}): string {
+    const completeOptions = getCompleteOptions(options);
+    const spaces = getSpaces(completeOptions);
     const lines: string[] = [];
-    if (writeXmlDeclaration)
+
+    if (completeOptions.writeXmlDeclaration)
       lines.push(`${spaces}<?xml${getAttrsString(this.declaration)}?>`);
 
     this.children.forEach(child => {
-      if (writeProcessingInstructions || !(child instanceof XmlWrapperNode))
-        lines.push(child.toXml({
-          indents,
-          minify,
-          spacesPerIndent,
-          writeProcessingInstructions,
-        }));
+      if (shouldWriteChild(child, completeOptions))
+        lines.push(child.toXml(completeOptions));
     });
 
-    return lines.join(minify ? "" : "\n");
+    return joinXmlLines(lines, completeOptions);
   }
 }
 
@@ -529,45 +528,40 @@ export class XmlElementNode extends XmlNodeBase {
     });
   }
 
-  toXml({
-    indents = 0,
-    minify = false,
-    spacesPerIndent = 2,
-    writeProcessingInstructions = true
-  }: XmlElementFormattingOptions = {}): string {
-    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
+  toXml(options: XmlElementFormattingOptions = {}): string {
+    const completeOptions = getCompleteOptions(options);
+    const spaces = getSpaces(completeOptions);
     const lines: string[] = [];
     const attrString = getAttrsString(this.attributes);
 
     if (this.numChildren === 0) {
       lines.push(`${spaces}<${this.tag}${attrString}/>`);
+    } else if (this.numChildren <= 2 && !this.child.hasChildren) {
+      const value = this.children.map(child => {
+        return shouldWriteChild(child, completeOptions)
+          ? child.toXml()
+          : "";
+      }).join("");
+      lines.push(`${spaces}<${this.tag}${attrString}>${value}</${this.tag}>`);
     } else {
-      const shouldWriteChild = (child: XmlNode) =>
-        (writeProcessingInstructions || !(child instanceof XmlWrapperNode));
+      lines.push(`${spaces}<${this.tag}${attrString}>`);
 
-      if (this.numChildren <= 2 && !this.child.hasChildren) {
-        const value = this.children.map(child => {
-          return shouldWriteChild(child)
-            ? child.toXml()
-            : "";
-        }).join('');
-        lines.push(`${spaces}<${this.tag}${attrString}>${value}</${this.tag}>`);
-      } else {
-        lines.push(`${spaces}<${this.tag}${attrString}>`);
-        const childIndents = minify ? indents : indents + 1;
-        this.children.forEach(child => {
-          if (shouldWriteChild(child)) lines.push(child.toXml({
-            indents: childIndents,
-            minify,
-            spacesPerIndent,
-            writeProcessingInstructions
-          }));
+      const childOptions = options.minify
+        ? completeOptions
+        : cloneOptionsWithOverrides(completeOptions, {
+          indents: completeOptions.indents + 1
         });
-        lines.push(`${spaces}</${this.tag}>`);
-      }
+
+      this.children.forEach(child => {
+        if (shouldWriteChild(child, completeOptions)) {
+          lines.push(child.toXml(childOptions));
+        }
+      });
+
+      lines.push(`${spaces}</${this.tag}>`);
     }
 
-    return lines.join(minify ? "" : "\n");
+    return joinXmlLines(lines, completeOptions);
   }
 }
 
@@ -586,13 +580,10 @@ export class XmlValueNode extends XmlNodeBase {
     return new XmlValueNode(this.value);
   }
 
-  toXml({
-    indents = 0,
-    minify = false,
-    spacesPerIndent = 2,
-  }: XmlValueFormattingOptions = {}): string {
-    if (this.value == undefined) return '';
-    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
+  toXml(options: XmlValueFormattingOptions = {}): string {
+    if (this.value == undefined) return "";
+    const completeOptions = getCompleteOptions(options);
+    const spaces = getSpaces(completeOptions);
     return `${spaces}${formatValue(this.value)}`;
   }
 }
@@ -607,13 +598,10 @@ export class XmlCommentNode extends XmlNodeBase {
     return new XmlCommentNode(this.value as string);
   }
 
-  toXml({
-    indents = 0,
-    minify = false,
-    spacesPerIndent = 2
-  }: XmlValueFormattingOptions = {}): string {
-    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
-    const comment = this.value == undefined ? '' : formatValue(this.value);
+  toXml(options: XmlValueFormattingOptions = {}): string {
+    const completeOptions = getCompleteOptions(options);
+    const spaces = getSpaces(completeOptions);
+    const comment = this.value == undefined ? "" : formatValue(this.value);
     return `${spaces}<!--${comment}-->`;
   }
 }
@@ -647,46 +635,42 @@ export class XmlWrapperNode extends XmlNodeBase {
     });
   }
 
-  toXml({
-    indents = 0,
-    minify = false,
-    spacesPerIndent = 2
-  }: XmlValueFormattingOptions = {}): string {
-    const spaces = minify ? "" : " ".repeat(indents * spacesPerIndent);
+  toXml(options: XmlValueFormattingOptions = {}): string {
+    const completeOptions = getCompleteOptions(options);
+    const spaces = getSpaces(completeOptions);
     const lines: string[] = [];
 
     // tags & children
     if (this.numChildren === 0) {
       lines.push(`${spaces}<?${this.tag}?>`);
     } else if (this.numChildren <= 2 && !this.child.hasChildren) {
-      const value = this.children.map(child => child.toXml()).join('');
+      const value = this.children.map(child => child.toXml()).join("");
       lines.push(`${spaces}<?${this.tag} ${value} ?>`);
     } else {
       lines.push(`${spaces}<?${this.tag}`);
-      if (minify) lines.push(" ");
-      const childIndents = minify ? indents : indents + 1;
+      if (completeOptions.minify) lines.push(" ");
+
+      const childOptions = options.minify
+        ? completeOptions
+        : cloneOptionsWithOverrides(completeOptions, {
+          indents: completeOptions.indents + 1
+        });
+
       this.children.forEach(child => {
-        lines.push(child.toXml({
-          indents: childIndents,
-          minify,
-          spacesPerIndent
-        }));
+        lines.push(child.toXml(childOptions));
       });
-      if (minify) lines.push(" ");
+
+      if (completeOptions.minify) lines.push(" ");
       lines.push(`${spaces}?>`);
     }
 
-    return lines.join(minify ? "" : "\n");
+    return joinXmlLines(lines, completeOptions);
   }
 }
 
 //#endregion Models
 
 //#region Helpers
-
-const PI_NODE_TAG = "__PI_NODE";
-
-class UnescapedProcessingInstructionsError extends Error { }
 
 /**
  * Formats a value that may appear in XML as a string.
@@ -838,13 +822,95 @@ function getAttrsString(attrs: Attributes): string {
   const attrKeys = Object.keys(attrs);
   const attrNodes: string[] = [];
   if (attrKeys.length > 0) {
-    attrNodes.push(''); // just for spacing
+    attrNodes.push(""); // just for spacing
     attrKeys.forEach(key => {
       const value = formatValue(attrs[key]);
       attrNodes.push(`${key}="${value}"`);
     });
   }
   return attrNodes.join(' ');
+}
+
+/**
+ * Fills in missing options with their default values.
+ * 
+ * @param options Options passed by user
+ */
+function getCompleteOptions(
+  options?: Partial<CompleteXmlFormattingOptions>
+): CompleteXmlFormattingOptions {
+  if (options?.__isComplete) return options as CompleteXmlFormattingOptions;
+
+  return {
+    indents: options?.indents ?? 0,
+    minify: options?.minify ?? false,
+    spacesPerIndent: options?.spacesPerIndent ?? 2,
+    writeComments: options?.writeComments ?? true,
+    writeProcessingInstructions: options?.writeProcessingInstructions ?? true,
+    writeXmlDeclaration: options?.writeXmlDeclaration ?? true,
+    __isComplete: true
+  };
+}
+
+/**
+ * Creates a new options objects that is a clone with overrides.
+ * 
+ * @param options Options to clone
+ * @param override Object of overrides
+ */
+function cloneOptionsWithOverrides(
+  options: CompleteXmlFormattingOptions,
+  override: XmlFormattingOptions
+): CompleteXmlFormattingOptions {
+  const clone: CompleteXmlFormattingOptions = { ...options };
+  for (const prop in override) clone[prop] = override[prop];
+  return clone;
+}
+
+/**
+ * Returns a string with the number of spaces to use for the current indentation
+ * level.
+ * 
+ * @param options Complete user options
+ */
+function getSpaces(options: CompleteXmlFormattingOptions): string {
+  return options.minify
+    ? ""
+    : " ".repeat(options.indents * options.spacesPerIndent);
+}
+
+/**
+ * Returns true if the child should be written with the given options, false if
+ * it shouldn't be.
+ * 
+ * @param child Child node in question
+ * @param options Complete user options
+ */
+function shouldWriteChild(
+  child: XmlNode,
+  options: CompleteXmlFormattingOptions
+): boolean {
+  if (child instanceof XmlWrapperNode) {
+    return options.writeProcessingInstructions;
+  } else if (child instanceof XmlCommentNode) {
+    return options.writeComments;
+  } else {
+    return true;
+  }
+}
+
+/**
+ * Returns a string that is the concatenation of the given lines following the 
+ * given user options.
+ * 
+ * @param lines Lines to join
+ * @param options Complete user options
+ */
+function joinXmlLines(
+  lines: string[],
+  options: CompleteXmlFormattingOptions
+): string {
+  return lines.join(options.minify ? "" : "\n");
 }
 
 //#endregion Helpers
