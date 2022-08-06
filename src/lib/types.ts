@@ -59,9 +59,9 @@ export interface RecycledNodesCache {
   elements: Map<string, Map<string, RecycledNodeRef<XmlElementNode>>>;
 
   /**
-   * A redundant mapping of all IDs to the nodes they belong to.
+   * A redundant mapping of all nodes to their ref objects.
    */
-  idMap: Map<number, RecycledNodeRef<XmlNode>>;
+  refMap: Map<XmlNode, RecycledNodeRef<XmlNode>>;
 
   /**
    * The unique ID to use for the next node.

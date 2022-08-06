@@ -624,7 +624,7 @@ function parseXml(
       options.recycledNodesCache = {
         comments: new Map(),
         elements: new Map(),
-        idMap: new Map(),
+        refMap: new Map(),
         nextId: 0,
         values: new Map(),
         wrappers: new Map()
@@ -649,17 +649,16 @@ function parseXml(
 
       if (nodeCache.comments.has(value)) {
         const nodeRef = nodeCache.comments.get(value);
-        nodeRef.refs++;
         return nodeRef.node;
       } else {
         const nodeRef: RecycledNodeRef<XmlCommentNode> = {
           id: nodeCache.nextId++,
           node: new XmlCommentNode(value),
-          refs: 1
+          refs: 0
         };
 
         nodeCache.comments.set(value, nodeRef);
-        nodeCache.idMap.set(nodeRef.id, nodeRef);
+        nodeCache.refMap.set(nodeRef.node, nodeRef);
         return nodeRef.node;
       }
     }
@@ -673,17 +672,94 @@ function parseXml(
 
       if (nodeCache.values.has(stringValue)) {
         const nodeRef = nodeCache.values.get(stringValue);
-        nodeRef.refs++;
         return nodeRef.node;
       } else {
         const nodeRef: RecycledNodeRef<XmlValueNode> = {
           id: nodeCache.nextId++,
           node: new XmlValueNode(value),
-          refs: 1
+          refs: 0
         };
 
         nodeCache.values.set(stringValue, nodeRef);
-        nodeCache.idMap.set(nodeRef.id, nodeRef);
+        nodeCache.refMap.set(nodeRef.node, nodeRef);
+        return nodeRef.node;
+      }
+    }
+
+    function buildElementNode(
+      tag: string,
+      attributes: Attributes,
+      children: XmlNode[]
+    ): XmlElementNode {
+      if (!options?.recycleNodes) return new XmlElementNode({
+        tag, attributes, children
+      });
+
+      const keySegments = [tag];
+
+      const attrSegments: string[] = [];
+      for (const attrKey in attributes) {
+        if (attrKey !== "n")
+          attrSegments.push(`${attrKey}=${attributes[attrKey]}`);
+      }
+      if (attrSegments.length) keySegments.push(attrSegments.join(","));
+
+      if (children.length) keySegments.push(children.map(child => {
+        const childRef = nodeCache.refMap.get(child);
+        childRef.refs++;
+        return childRef.id;
+      }).join(","));
+
+      const primaryKey = keySegments.join("&");
+
+      const nameMap = nodeCache.elements.get(primaryKey) ?? new Map();
+      if (!nodeCache.elements.has(primaryKey))
+        nodeCache.elements.set(primaryKey, nameMap);
+
+      const nameKey = attributes.n ?? "";
+      if (nameMap.has(nameKey)) {
+        return nameMap.get(nameKey).node;
+      } else {
+        const nodeRef: RecycledNodeRef<XmlElementNode> = {
+          id: nodeCache.nextId++,
+          node: new XmlElementNode({ tag, attributes, children }),
+          refs: 0
+        };
+
+        nameMap.set(nameKey, nodeRef);
+        nodeCache.refMap.set(nodeRef.node, nodeRef);
+        return nodeRef.node;
+      }
+    }
+
+    function buildWrapperNode(
+      tag: string,
+      children: XmlNode[]
+    ): XmlWrapperNode {
+      if (!options?.recycleNodes) return new XmlWrapperNode({
+        tag, children
+      });
+
+      const childIds = children.map(child => {
+        const childRef = nodeCache.refMap.get(child);
+        childRef.refs++;
+        return childRef.id;
+      }).join(",");
+
+      const key = childIds ? tag : `${tag}&${childIds}`;
+
+      if (nodeCache.wrappers.has(key)) {
+        const nodeRef = nodeCache.wrappers.get(key);
+        return nodeRef.node;
+      } else {
+        const nodeRef: RecycledNodeRef<XmlWrapperNode> = {
+          id: nodeCache.nextId++,
+          node: new XmlWrapperNode({ tag, children }),
+          refs: 0
+        };
+
+        nodeCache.wrappers.set(key, nodeRef);
+        nodeCache.refMap.set(nodeRef.node, nodeRef);
         return nodeRef.node;
       }
     }
@@ -722,8 +798,8 @@ function parseXml(
           declaration = attributes;
         } else {
           return isWrapper
-            ? new XmlWrapperNode({ tag: attributes.tag, children })
-            : new XmlElementNode({ tag, children, attributes });
+            ? buildWrapperNode(attributes.tag, children)
+            : buildElementNode(tag, attributes, children);
         }
       }
     }
