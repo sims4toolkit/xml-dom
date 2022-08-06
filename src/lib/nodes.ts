@@ -11,6 +11,9 @@ import type {
 
 //#region Models
 
+/** An error to throw when a PI tag is detected. */
+class UnescapedProcessingInstructionsError extends Error { }
+
 /** A node in an XML DOM. */
 export interface XmlNode {
   //#region Properties
@@ -360,7 +363,7 @@ export class XmlDocumentNode extends XmlNodeBase {
     declaration?: Attributes
   }) {
     super({ children: (root ? [root] : []) })
-    this._declaration = options?.declaration ?? DEFAULT_XML_DECLARATION();
+    this._declaration = options?.declaration ?? getDefaultDeclaration();
   }
 
   /**
@@ -584,20 +587,11 @@ export class XmlWrapperNode extends XmlNodeBase {
 
 //#endregion Models
 
-//#region Utility
+//#region Constants
 
 const PI_NODE_TAG = "__PI_NODE";
 
-/** The line that appears at the top of XML files. */
-const DEFAULT_XML_DECLARATION = () => ({
-  version: "1.0",
-  encoding: "utf-8"
-});
-
-/** An error to throw when a PI tag is detected. */
-class UnescapedProcessingInstructionsError extends Error { }
-
-//#endregion Utility
+//#endregion Constants
 
 //#region Helpers
 
@@ -837,6 +831,16 @@ function joinXmlLines(
   options: CompleteXmlFormattingOptions
 ): string {
   return lines.join(options.minify ? "" : "\n");
+}
+
+/**
+ * Returns the default declaration to use for XML documents.
+ */
+function getDefaultDeclaration() {
+  return {
+    version: "1.0",
+    encoding: "utf-8"
+  };
 }
 
 //#endregion Helpers
