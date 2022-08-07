@@ -5,6 +5,8 @@ import { XmlDocumentNode, XmlElementNode, XmlValueNode, XmlCommentNode } from ".
 describe('XmlDocumentNode', function () {
   const newNode = (root?: XmlNode) => new XmlDocumentNode(root);
 
+  //#region Initialization
+
   describe('#constructor', function () {
     it('should not throw when no children are given', function () {
       expect(() => new XmlDocumentNode()).to.not.throw();
@@ -376,10 +378,17 @@ describe('XmlDocumentNode', function () {
     });
   });
 
+  describe("#fromRecycled()", () => {
+    // TODO:
+  });
+
+  //#endregion Initialization
+
+  //#region Properties
+
   describe('#attributes', function () {
     it('should not be assignable', function () {
       const node = newNode();
-      //@ts-expect-error
       expect(() => node.attributes = { n: "name" }).to.throw();
     });
 
@@ -418,8 +427,11 @@ describe('XmlDocumentNode', function () {
   describe('#children', function () {
     it('should not be assignable', function () {
       const node = newNode();
-      //@ts-expect-error
-      expect(() => node.children = [new XmlCommentNode("hi")]).to.throw();
+      const child = new XmlCommentNode("hi");
+      expect(node.children).to.be.an("Array").that.is.empty;
+      node.children = [child];
+      expect(node.children).to.be.an("Array").with.lengthOf(1);
+      expect(node.child).to.equal(child);
     });
 
     it('should be an empty array if there are no children', function () {
@@ -443,8 +455,16 @@ describe('XmlDocumentNode', function () {
   describe("#declaration", () => {
     it("should throw when assigned", () => {
       const doc = new XmlDocumentNode();
-      //@ts-expect-error
-      expect(() => doc.declaration = {}).to.throw();
+      doc.declaration = { version: "2.0" };
+      expect(doc.declaration.version).to.equal("2.0");
+    });
+
+    it("should use the default declaration if undefined", () => {
+      const doc = new XmlDocumentNode();
+      //@ts-ignore
+      doc.declaration = undefined;
+      expect(doc.declaration.version).to.equal("1.0");
+      expect(doc.declaration.encoding).to.equal("utf-8");
     });
 
     it("should mutate the declaration", () => {
@@ -594,6 +614,10 @@ describe('XmlDocumentNode', function () {
       expect(node.value).to.be.undefined;
     });
   });
+
+  //#endregion Properties
+
+  //#region Methods
 
   describe('#addChildren()', function () {
     it('should do nothing when no children are given', function () {
@@ -1007,4 +1031,6 @@ describe('XmlDocumentNode', function () {
 </L>`);
     });
   });
+
+  //#endregion Methods
 });
