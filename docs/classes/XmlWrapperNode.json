@@ -1,13 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
   "imports": [
-    "import { XmlElementNode } from \"@s4tk/xml-dom\"; // ESM",
-    "const { XmlElementNode } = require(\"@s4tk/xml-dom\"); // CJS"
+    "import { XmlWrapperNode } from \"@s4tk/xml-dom\"; // ESM",
+    "const { XmlWrapperNode } = require(\"@s4tk/xml-dom\"); // CJS"
   ],
   "header": {
     "title": {
       "prefix": "class",
-      "name": "XmlElementNode",
+      "name": "XmlWrapperNode",
       "implements": [
         {
           "name": "XmlNode",
@@ -19,7 +19,7 @@
         }
       ]
     },
-    "description": "A node for an XML element that has a tag, attributes, and children.",
+    "description": "A processing instruction node that contains other XML.",
     "sourceCode": "src/lib/nodes.ts"
   },
   "sections": [
@@ -30,9 +30,9 @@
           "displayType": "function",
           "name": "constructor",
           "returnType": {
-            "name": "XmlElementNode"
+            "name": "XmlWrapperNode"
           },
-          "description": "Creates a new XmlElementNode.",
+          "description": "Creates a new XmlWrapperNode.",
           "arguments": [
             {
               "optional": true,
@@ -48,14 +48,6 @@
                     "name": "string"
                   },
                   "description": "String to appear within the tag."
-                },
-                {
-                  "name": "attributes",
-                  "optional": true,
-                  "type": {
-                    "name": "object"
-                  },
-                  "description": "Object containing attributes."
                 },
                 {
                   "name": "children",
@@ -75,35 +67,15 @@
           ],
           "examples": [
             {
-              "code": "const node = new XmlElementNode({\n  tag: \"L\",\n  attributes: {\n    n: \"some_list\"\n  },\n  children: [\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(25)\n      ]\n    }),\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(50)\n      ]\n    })\n  ]\n});"
+              "code": "const node = new XmlWrapperNode({\n  tag: \"ignore\",\n  children: [\n    new XmlElementNode({\n      tag: \"T\",\n      children: [\n        new XmlValueNode(12345)\n      ]\n    })\n  ]\n}); "
             },
             {
-              "code": "<!-- Output -->\n<L n=\"some_list\">\n  <T>25</T>\n  <T>50</T>\n</L>",
+              "code": "<!-- Output -->\n<?ignore\n  <T>12345</T>\n?>",
               "lang": "xml"
             }
           ]
         }
       ]
     }
-  ],
-  "footer": {
-    "seeAlso": [
-      {
-        "name": "L",
-        "path": {
-          "pkg": "tunables",
-          "group": "nodes",
-          "item": "L"
-        }
-      },
-      {
-        "name": "T",
-        "path": {
-          "pkg": "tunables",
-          "group": "nodes",
-          "item": "T"
-        }
-      }
-    ]
-  }
+  ]
 }

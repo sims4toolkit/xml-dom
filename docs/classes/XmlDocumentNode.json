@@ -20,9 +20,23 @@
       ]
     },
     "description": "A node for an XML document that can have children. Tuning documents should always have one child and one child only, but multiple children are supported.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/nodes.ts"
   },
   "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "prefix": "get, set",
+          "name": "declaration",
+          "description": "The attributes that should appear in the XML declaration.",
+          "type": {
+            "name": "object"
+          }
+        }
+      ]
+    },
     {
       "title": "Intialization",
       "content": [
@@ -35,8 +49,8 @@
           "description": "Creates a new XmlDocumentNode.",
           "arguments": [
             {
-              "optional": true,
               "name": "root",
+              "optional": true,
               "type": {
                 "name": "XmlNode",
                 "path": {
@@ -46,6 +60,24 @@
                 }
               },
               "description": "Node to use as the root of this document."
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "type": {
+                "name": "object"
+              },
+              "description": "Optional arguments.",
+              "properties": [
+                {
+                  "name": "declaration",
+                  "optional": true,
+                  "type": {
+                    "name": "object"
+                  },
+                  "description": "The attributes to use in the XML declaration. Default value is `{ version: \"1.0\", encoding: \"utf-8\" }`."
+                }
+              ]
             }
           ],
           "examples": [
@@ -77,33 +109,56 @@
             {
               "name": "options",
               "optional": true,
-              "description": "Object containing optional settings.",
+              "description": "Object containing options.",
               "type": {
-                "name": "object"
-              },
-              "properties": [
-                {
-                  "name": "allowMultipleRoots",
-                  "optional": true,
-                  "description": "Whether or not to allow multiple root nodes. If false, an exception is thrown if there is more than one root. False by default.",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "name": "ignoreComments",
-                  "optional": true,
-                  "description": "Whether or not to ignore comments while parsing XML. If true, then comments will be entirely left out. False by default.",
-                  "type": {
-                    "name": "boolean"
-                  }
+                "name": "XmlParsingOptions",
+                "path": {
+                  "pkg": "xml-dom",
+                  "group": "types",
+                  "item": "XmlParsingOptions"
                 }
-              ]
+              }
             }
           ],
           "examples": [
             {
               "code": "const xml = `<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<M n=\"some.module\" s=\"15948711490371124562\">\n  <C n=\"SomeClass\">\n    <T n=\"NUMBER\">50</T>\n    <T n=\"BOOLEAN\">True</T>\n  </C>\n</M>`;\n\nconst docFromXml = XmlDocumentNode.from(xml);"
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "prefix": "static",
+          "name": "fromRecycled",
+          "returnType": {
+            "name": "XmlParsingRecycledResult",
+            "path": {
+              "pkg": "xml-dom",
+              "group": "types",
+              "item": "XmlParsingRecycledResult"
+            }
+          },
+          "description": "Parses the given XML data as a XmlDocumentNode, reusing nodes that share the same structure, and returns the document with the built cache.",
+          "arguments": [
+            {
+              "name": "xml",
+              "type": {
+                "name": "string | Buffer"
+              },
+              "description": "XML content to create document from."
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "description": "Object containing options.",
+              "type": {
+                "name": "Omit<XmlParsingOptions, \"recycleNodes\">",
+                "path": {
+                  "pkg": "xml-dom",
+                  "group": "types",
+                  "item": "XmlParsingOptions"
+                }
+              }
             }
           ]
         }

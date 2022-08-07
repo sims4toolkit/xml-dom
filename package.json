@@ -1,6 +1,6 @@
 {
   "name": "@s4tk/xml-dom",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "main": "xml.js",
   "repository": {
     "type": "git",
@@ -34,6 +34,6 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "fast-xml-parser": "^4.0.1"
+    "fast-xml-parser": "^4.0.9"
   }
 }

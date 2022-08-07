@@ -1,0 +1,45 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "interface",
+      "name": "XmlParsingRecycledResult"
+    },
+    "description": "The result of parsing XML with recycled cells.",
+    "sourceCode": "src/lib/types.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "name": "doc",
+          "optional": true,
+          "description": "The XML document that was parsed.",
+          "type": {
+            "name": "XmlDocumentNode",
+            "path": {
+              "pkg": "xml-dom",
+              "group": "classes",
+              "item": "XmlDocumentNode"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "recylingCache",
+          "description": "The cache that was used to recycle nodes. Guaranteed to be defined if recycleNodes = true was true when parsing.",
+          "type": {
+            "name": "RecycledNodesCache",
+            "path": {
+              "pkg": "xml-dom",
+              "group": "types",
+              "item": "RecycledNodesCache"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

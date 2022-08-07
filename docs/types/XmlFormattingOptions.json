@@ -1,15 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
-  "imports": [
-    "import type { XmlFormattingOptions } from \"@s4tk/xml-dom\"; // TypeScript only"
-  ],
   "header": {
     "title": {
       "prefix": "interface",
       "name": "XmlFormattingOptions"
     },
     "description": "Options to use when writing a node as an XML string.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/types.ts"
   },
   "sections": [
     {
@@ -17,20 +14,20 @@
       "content": [
         {
           "displayType": "property",
-          "name": "includeProcessingInstructions",
+          "name": "indents",
           "optional": true,
-          "description": "Whether or not to include the XML processing instruction tag at the top of this output. Only applicable to document nodes. (Default = true)",
+          "description": "Number of times to indent this node. This will increase by 1 for each recursive call, unless minify = true. (Default = 0)",
           "type": {
-            "name": "boolean"
+            "name": "number"
           }
         },
         {
           "displayType": "property",
-          "name": "indents",
+          "name": "minify",
           "optional": true,
-          "description": "Number of times to indent this node. This will increase by 1 for each recursive call. (Default = 0)",
+          "description": "Whether or not the output XML should be minified (i.e. have all of its unneeded whitespace removed). If true, then indents and spacesPerIndent will be ignored, and the output will appear on one line. (Default = false)",
           "type": {
-            "name": "number"
+            "name": "boolean"
           }
         },
         {
@@ -40,6 +37,33 @@
           "description": "Number of spaces to use per indent. (Default = 2)",
           "type": {
             "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "writeComments",
+          "optional": true,
+          "description": "Whether or not to include comments. It is recommended to set this to false when minify = true. (Default = true)",
+          "type": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "writeProcessingInstructions",
+          "optional": true,
+          "description": "Whether or not to include any XML processing instructions other than the XML declaration at the top of the file. It is recommended to set this to false when minify = true. (Default = true)",
+          "type": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "writeXmlDeclaration",
+          "optional": true,
+          "description": "Whether or not to include the XML declaration at the top of the file. Only applicable to document nodes. (Default = true)",
+          "type": {
+            "name": "boolean"
           }
         }
       ]

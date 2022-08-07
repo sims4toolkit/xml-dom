@@ -6,7 +6,7 @@
       "name": "XmlValue"
     },
     "description": "Values that can be nested in an XmlValueNode.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/types.ts"
   },
   "sections": [
     {

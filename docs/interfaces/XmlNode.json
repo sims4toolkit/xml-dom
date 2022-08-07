@@ -9,7 +9,7 @@
       "name": "XmlNode"
     },
     "description": "A node in an XML document model.",
-    "sourceCode": "src/xml.ts"
+    "sourceCode": "src/lib/nodes.ts"
   },
   "sections": [
     {
@@ -17,7 +17,7 @@
       "content": [
         {
           "displayType": "property",
-          "prefix": "get",
+          "prefix": "get, set",
           "name": "attributes",
           "description": "Object containing the attributes of this node. If this node cannot have attributes, it is undefined.",
           "type": {
@@ -35,7 +35,7 @@
         },
         {
           "displayType": "property",
-          "prefix": "get",
+          "prefix": "get, set",
           "name": "children",
           "description": "The children of this node. This is guaranteed to be an array if the node can have children, but if it can't, it is undefined.",
           "type": {

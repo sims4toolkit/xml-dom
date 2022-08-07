@@ -3,3 +3,4 @@ dst/
 out/
 .vscode/settings.json
 .DS_Store
+localTests/
