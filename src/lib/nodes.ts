@@ -420,18 +420,6 @@ export class XmlDocumentNode extends XmlNodeBase {
     return { doc, recylingCache };
   }
 
-  addChildren(...children: XmlNode[]): void {
-    if (this.numChildren + children.length > 1)
-      throw new Error("XML document should only have one root node.");
-    super.addChildren(...children);
-  }
-
-  addClones(...children: XmlNode[]): void {
-    if (this.numChildren + children.length > 1)
-      throw new Error("XML document should only have one root node.");
-    super.addClones(...children);
-  }
-
   clone(): XmlDocumentNode {
     const declaration = Object.assign({}, this.declaration);
     const clone = new XmlDocumentNode(null, { declaration });
