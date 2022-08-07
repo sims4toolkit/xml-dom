@@ -621,31 +621,109 @@ describe('XmlDocumentNode', function () {
     context("wrapper node", () => {
       context("has same tag and children", () => {
         it("should be shared if in same element node", () => {
-          // TODO:
+          const root = getDocumentNode(`<I>
+            <U n="tuple">
+              <?ignore <T>12345</T> ?>
+            </U>
+            <U n="tuple">
+              <?ignore <T>12345</T> ?>
+            </U>
+          </I>`).child;
+
+          const [firstParent, secondParent] = root.children;
+          expect(firstParent).to.equal(secondParent);
+          const first = firstParent.child;
+          const second = secondParent.child;
+          expect(first).to.equal(second);
         });
 
         it("should be shared if in different element node", () => {
-          // TODO:
+          const root = getDocumentNode(`<I>
+            <U n="first">
+              <?ignore <T>12345</T> ?>
+            </U>
+            <U n="second">
+              <?ignore <T>12345</T> ?>
+            </U>
+          </I>`).child;
+
+          const [firstParent, secondParent] = root.children;
+          expect(firstParent).to.not.equal(secondParent);
+          const first = firstParent.child;
+          const second = secondParent.child;
+          expect(first).to.equal(second);
         });
       });
 
       context("has different tag", () => {
         it("should not be shared if in same element node", () => {
-          // TODO:
+          const root = getDocumentNode(`<I>
+            <U n="tuple">
+              <?ignore <T>12345</T> ?>
+            </U>
+            <U n="tuple">
+              <?something <T>12345</T> ?>
+            </U>
+          </I>`).child;
+
+          const [firstParent, secondParent] = root.children;
+          expect(firstParent).to.not.equal(secondParent);
+          const first = firstParent.child;
+          const second = secondParent.child;
+          expect(first).to.not.equal(second);
         });
 
         it("should not be shared if in different element node", () => {
-          // TODO:
+          const root = getDocumentNode(`<I>
+            <U n="first">
+              <?ignore <T>12345</T> ?>
+            </U>
+            <U n="second">
+              <?something <T>12345</T> ?>
+            </U>
+          </I>`).child;
+
+          const [firstParent, secondParent] = root.children;
+          expect(firstParent).to.not.equal(secondParent);
+          const first = firstParent.child;
+          const second = secondParent.child;
+          expect(first).to.not.equal(second);
         });
       });
 
       context("has different children", () => {
         it("should not be shared if in same element node", () => {
-          // TODO:
+          const root = getDocumentNode(`<I>
+            <U n="tuple">
+              <?ignore <T>12345</T> ?>
+            </U>
+            <U n="tuple">
+              <?ignore <T>67890</T> ?>
+            </U>
+          </I>`).child;
+
+          const [firstParent, secondParent] = root.children;
+          expect(firstParent).to.not.equal(secondParent);
+          const first = firstParent.child;
+          const second = secondParent.child;
+          expect(first).to.not.equal(second);
         });
 
         it("should not be shared if in different element node", () => {
-          // TODO:
+          const root = getDocumentNode(`<I>
+            <U n="first">
+              <?ignore <T>12345</T> ?>
+            </U>
+            <U n="second">
+              <?ignore <T>67890</T> ?>
+            </U>
+          </I>`).child;
+
+          const [firstParent, secondParent] = root.children;
+          expect(firstParent).to.not.equal(secondParent);
+          const first = firstParent.child;
+          const second = secondParent.child;
+          expect(first).to.not.equal(second);
         });
       });
     });
