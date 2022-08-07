@@ -472,9 +472,79 @@ describe('XmlDocumentNode', function () {
       });
     });
 
-    // TODO:
+    context("element node", () => {
+      context("has same tag, attrs, and children", () => {
+        it("should be shared if in same element node", () => {
+          // TODO:
+        });
 
-    // TODO:
+        it("should be shared if in different element node", () => {
+          // TODO:
+        });
+      });
+
+      context("has different tag", () => {
+        it("should not be shared if in same element node", () => {
+          // TODO:
+        });
+
+        it("should not be shared if in different element node", () => {
+          // TODO:
+        });
+      });
+
+      context("has different attrs", () => {
+        it("should not be shared if in same element node", () => {
+          // TODO:
+        });
+
+        it("should not be shared if in different element node", () => {
+          // TODO:
+        });
+      });
+
+      context("has different children", () => {
+        it("should not be shared if in same element node", () => {
+          // TODO:
+        });
+
+        it("should not be shared if in different element node", () => {
+          // TODO:
+        });
+      });
+    });
+
+    context("wrapper node", () => {
+      context("has same tag and children", () => {
+        it("should be shared if in same element node", () => {
+          // TODO:
+        });
+
+        it("should be shared if in different element node", () => {
+          // TODO:
+        });
+      });
+
+      context("has different tag", () => {
+        it("should not be shared if in same element node", () => {
+          // TODO:
+        });
+
+        it("should not be shared if in different element node", () => {
+          // TODO:
+        });
+      });
+
+      context("has different children", () => {
+        it("should not be shared if in same element node", () => {
+          // TODO:
+        });
+
+        it("should not be shared if in different element node", () => {
+          // TODO:
+        });
+      });
+    });
   });
 
   //#endregion Initialization
