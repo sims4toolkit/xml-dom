@@ -982,14 +982,11 @@ describe('XmlDocumentNode', function () {
       expect(node.children[0].value).to.equal("hi");
     });
 
-    it('should throw if given more than one child', function () {
+    it("should add the multiple children that are given", () => {
       const node = newNode();
-      expect(() => node.addChildren(new XmlValueNode("hi"), new XmlValueNode("bye"))).to.throw();
-    });
-
-    it('should throw if there is already a child', function () {
-      const node = newNode(new XmlValueNode("hi"));
-      expect(() => node.addChildren(new XmlValueNode("bye"))).to.throw();
+      expect(node.numChildren).to.equal(0);
+      node.addChildren(new XmlValueNode("hi"), new XmlValueNode("bye"));
+      expect(node.numChildren).to.equal(2);
     });
 
     it('should mutate the original children', function () {
@@ -1017,14 +1014,11 @@ describe('XmlDocumentNode', function () {
       expect(node.children[0].value).to.equal("hi");
     });
 
-    it('should throw if more than one child is given', function () {
+    it("should add the multiple children that are given", () => {
       const node = newNode();
-      expect(() => node.addClones(new XmlValueNode("hi"), new XmlValueNode("bye"))).to.throw();
-    });
-
-    it('should throw if there is already a child', function () {
-      const node = newNode(new XmlValueNode("hi"));
-      expect(() => node.addClones(new XmlValueNode("bye"))).to.throw();
+      expect(node.numChildren).to.equal(0);
+      node.addClones(new XmlValueNode("hi"), new XmlValueNode("bye"));
+      expect(node.numChildren).to.equal(2);
     });
 
     it('should not mutate the original children', function () {
