@@ -21,7 +21,6 @@ describe('XmlValueNode', function () {
   describe('#attributes', function () {
     it('should not be assignable', function () {
       const node = newNode();
-      //@ts-expect-error
       expect(() => node.attributes = {}).to.throw();
     });
 
@@ -46,7 +45,6 @@ describe('XmlValueNode', function () {
   describe('#children', function () {
     it('should not be assignable', function () {
       const node = newNode();
-      //@ts-expect-error
       expect(() => node.children = []).to.throw();
     });
 

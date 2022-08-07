@@ -33,10 +33,10 @@ describe('XmlElementNode', function () {
   });
 
   describe('#attributes', function () {
-    it('should not be assignable', function () {
+    it('should be assignable', function () {
       const node = newNode();
-      //@ts-expect-error
-      expect(() => node.attributes = { n: "name" }).to.throw();
+      node.attributes = { n: "something" };
+      expect(node.name).to.equal("something");
     });
 
     it('should not be undefined when there are no attributes', function () {
@@ -86,10 +86,13 @@ describe('XmlElementNode', function () {
   });
 
   describe('#children', function () {
-    it('should throw when trying to set', function () {
+    it("should be settable", () => {
       const node = newNode();
-      //@ts-expect-error
-      expect(() => node.children = [newNode()]).to.throw();
+      const child = new XmlCommentNode("hi");
+      expect(node.children).to.be.an("Array").that.is.empty;
+      node.children = [child];
+      expect(node.children).to.be.an("Array").with.lengthOf(1);
+      expect(node.child).to.equal(child);
     });
 
     it('should be an empty array if there are no children', function () {
@@ -110,7 +113,7 @@ describe('XmlElementNode', function () {
     it('should not be assignable', function () {
       const node = newNode();
       //@ts-expect-error
-      expect(() => node.children = [newNode()]).to.throw();
+      expect(() => node.hasChildren = false).to.throw();
     });
 
     it('should return true when it has children', function () {

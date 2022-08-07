@@ -45,7 +45,6 @@ describe("XmlWrapperNode", () => {
   describe("#attributes", () => {
     it("should not be assignable", () => {
       const node = newNode();
-      //@ts-expect-error
       expect(() => node.attributes = {}).to.throw();
     });
 
@@ -85,10 +84,13 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#children", () => {
-    it("should throw when trying to set", () => {
+    it("should be settable", () => {
       const node = newNode();
-      //@ts-expect-error
-      expect(() => node.children = [newNode()]).to.throw();
+      const child = new XmlCommentNode("hi");
+      expect(node.children).to.be.an("Array").that.is.empty;
+      node.children = [child];
+      expect(node.children).to.be.an("Array").with.lengthOf(1);
+      expect(node.child).to.equal(child);
     });
 
     it("should be an empty array if there are no children", () => {
@@ -106,12 +108,6 @@ describe("XmlWrapperNode", () => {
   });
 
   describe("#hasChildren", () => {
-    it("should not be assignable", () => {
-      const node = newNode();
-      //@ts-expect-error
-      expect(() => node.children = [newNode()]).to.throw();
-    });
-
     it("should return true when it has children", () => {
       const node = newNode();
       node.addChildren(newNode());

@@ -425,7 +425,7 @@ describe('XmlDocumentNode', function () {
   });
 
   describe('#children', function () {
-    it('should not be assignable', function () {
+    it('should be assignable', function () {
       const node = newNode();
       const child = new XmlCommentNode("hi");
       expect(node.children).to.be.an("Array").that.is.empty;

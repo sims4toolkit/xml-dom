@@ -253,7 +253,7 @@ abstract class XmlNodeBase implements XmlNode {
   set children(children: XmlNode[]) {
     if (!this.hasChildren)
       throw new Error("Cannot set children of childless node.");
-    this._children = children;
+    this._children = children ?? [];
   }
 
   set id(id: string | number | bigint) {
