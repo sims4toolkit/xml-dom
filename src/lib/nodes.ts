@@ -3,7 +3,6 @@ import type {
   Attributes,
   CompleteXmlFormattingOptions,
   RecycledNodeRef,
-  RecycledNodesCache,
   XmlElementFormattingOptions,
   XmlFormattingOptions,
   XmlParsingOptions,
@@ -28,6 +27,7 @@ export interface XmlNode {
    * (e.g. value nodes, comment nodes), it is undefined.
    */
   get attributes(): Attributes;
+  set attributes(attributes: Attributes);
 
   /**
    * The first child of this node. If there are no children, it is undefined.
@@ -43,6 +43,7 @@ export interface XmlNode {
    * cannot (e.g. values or comments).
    */
   get children(): XmlNode[];
+  set children(children: XmlNode[]);
 
   /** Whether or not this node has an array for children. */
   get hasChildren(): boolean;
@@ -237,10 +238,22 @@ abstract class XmlNodeBase implements XmlNode {
 
   //#region Setters
 
+  set attributes(attributes: Attributes) {
+    if (this.attributes === undefined)
+      throw new Error("Cannot set attribute of non-element node.")
+    this._attributes = attributes ?? {};
+  }
+
   set child(child: XmlNode) {
     if (!this.hasChildren)
       throw new Error("Cannot set child of childless node.");
     this.children[0] = child;
+  }
+
+  set children(children: XmlNode[]) {
+    if (!this.hasChildren)
+      throw new Error("Cannot set children of childless node.");
+    this._children = children;
   }
 
   set id(id: string | number | bigint) {
@@ -348,8 +361,9 @@ export class XmlDocumentNode extends XmlNodeBase {
   protected _declaration?: Attributes;
 
   /** The attributes that should appear in the XML declaration. */
-  get declaration(): Attributes {
-    return this._declaration;
+  get declaration(): Attributes { return this._declaration; }
+  set declaration(declaration: Attributes) {
+    this._declaration = declaration ?? getDefaultDeclaration();
   }
 
   /**
@@ -367,7 +381,7 @@ export class XmlDocumentNode extends XmlNodeBase {
     declaration?: Attributes
   }) {
     super({ children: (root ? [root] : []) })
-    this._declaration = options?.declaration ?? getDefaultDeclaration();
+    this.declaration = options?.declaration;
   }
 
   /**
@@ -735,14 +749,25 @@ function parseXml(
 
       const primaryKey = keySegments.join("&");
 
-      const nameMap = nodeCache.elements.get(primaryKey) ?? new Map();
+      const nameMap = nodeCache.elements.get(primaryKey)
+        ?? new Map<string, RecycledNodeRef<XmlElementNode>>();
+
       if (!nodeCache.elements.has(primaryKey))
         nodeCache.elements.set(primaryKey, nameMap);
 
       const nameKey = attributes.n ?? "";
       if (nameMap.has(nameKey)) {
-        return nameMap.get(nameKey).node;
+        const nodeRef = nameMap.get(nameKey);
+        return nodeRef.node;
       } else {
+        // let idToUse: number;
+        // if (nameMap.size > 0) {
+        //   const [first] = nameMap.values();
+        //   idToUse = first.id;
+        // } else {
+        //   idToUse = nodeCache.nextId++;
+        // }
+
         const nodeRef: RecycledNodeRef<XmlElementNode> = {
           id: nodeCache.nextId++,
           node: new XmlElementNode({ tag, attributes, children }),

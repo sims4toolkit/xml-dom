@@ -28,7 +28,7 @@
       "content": [
         {
           "displayType": "property",
-          "prefix": "get",
+          "prefix": "get, set",
           "name": "declaration",
           "description": "The attributes that should appear in the XML declaration.",
           "type": {
