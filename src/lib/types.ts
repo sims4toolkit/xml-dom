@@ -1,4 +1,11 @@
-import type { XmlNode, XmlElementNode, XmlCommentNode, XmlValueNode, XmlWrapperNode, XmlDocumentNode } from "./nodes";
+import type {
+  XmlNode,
+  XmlElementNode,
+  XmlCommentNode,
+  XmlValueNode,
+  XmlWrapperNode,
+  XmlDocumentNode
+} from "./nodes";
 
 /** Generic interface that can support any attributes. */
 export type Attributes = { [key: string]: any; };
@@ -20,6 +27,9 @@ export interface RecycledNodeRef<T extends XmlNode> {
   refs: number;
 }
 
+/** A mapping of unique identifiers to recycled node refs. */
+export type RecycledNodeRefMap<T extends XmlNode> = Map<string, RecycledNodeRef<T>>;
+
 /** Object containing recyled nodes. */
 export interface RecycledNodesCache {
   /**
@@ -31,32 +41,24 @@ export interface RecycledNodesCache {
    * Example:
    * - `<!--Something-->` => `"Something"`
    */
-  comments: Map<string, RecycledNodeRef<XmlCommentNode>>;
+  comments: RecycledNodeRefMap<XmlCommentNode>;
 
   /**
    * Mapping of element nodes.
    * 
    * ### First Key
-   * The concatenation of this node's tag, attributes (except for `n`), and
-   * child refs. Attribute key/values are joined with "=", attributes are sorted
-   * by key and then joined with ",", and child refs are sorted and joined with
-   * ",". The tag, attributes, and child refs are then joined with "&".
+   * The concatenation of this node's tag, attributes, and child IDs. Attribute
+   * key/values are joined with "=", attributes are sorted by key and then
+   * joined with ",", and child IDs are sorted and joined with ",". The tag,
+   * attributes, and child refs are then joined with "&".
    * 
    * Examples:
-   * - `<V n="name" t="type"/>` => `"V&t=type"`
-   * - `<I s="12345" c="class" />` => `"I&c=class,s=12345"`
+   * - `<V t="type"/>` => `"V&t=type"`
+   * - `<V n="name" t="type"/>` => `"V&n=name,t=type"`
    * - `<V t="type"> ... </V>` w/ id 5 => `"V&t=type&5"`
    * - `<L> ... </L>` w/ ids 5 + 10 => `"L&5,10"`
-   * 
-   * ### Second Key
-   * The name (`n` attribute), if there is one. If the element does not have a
-   * name, then an empty string is used.
-   * 
-   * Examples:
-   * - `<V n="name" t="type"/>` => `"name"`
-   * - `<V t="type" />` => `""`
    */
-  elements: Map<string, Map<string, RecycledNodeRef<XmlElementNode>>>;
+  elements: RecycledNodeRefMap<XmlElementNode>;
 
   /**
    * A redundant mapping of all nodes to their ref objects.
@@ -78,7 +80,7 @@ export interface RecycledNodesCache {
    * - `Something` => `"Something"`
    * - `12345` => `"12345"`
    */
-  values: Map<string, RecycledNodeRef<XmlValueNode>>;
+  values: RecycledNodeRefMap<XmlValueNode>;
 
   /**
    * Mapping of wrapper nodes.
@@ -92,7 +94,7 @@ export interface RecycledNodesCache {
    * - `<?ignore ... ?>` w/ id 5  => `"ignore&5"`
    * - `<?ignore ... ?>` w/ ids 5 + 10  => `"ignore&5,10"`
    */
-  wrappers: Map<string, RecycledNodeRef<XmlWrapperNode>>;
+  wrappers: RecycledNodeRefMap<XmlWrapperNode>;
 }
 
 /** Options to use when reading XML from a string/buffer. */

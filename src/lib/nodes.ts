@@ -3,6 +3,8 @@ import type {
   Attributes,
   CompleteXmlFormattingOptions,
   RecycledNodeRef,
+  RecycledNodeRefMap,
+  RecycledNodesCache,
   XmlElementFormattingOptions,
   XmlFormattingOptions,
   XmlParsingOptions,
@@ -573,13 +575,13 @@ export class XmlWrapperNode extends XmlNodeBase {
    * - `tag`: Required. The tag to use for this node (do NOT include "?").
    * - `children`: An array for the children of this node. (Default = [])
    * 
-   * @param args Arguments for construction 
+   * @param args Arguments for construction
    */
   constructor({ tag, children = [] }: {
     tag: string;
     children?: XmlNode[];
   }) {
-    if (!tag) throw new Error("Element tag must be a non-empty string.");
+    if (!tag) throw new Error("PI tag must be a non-empty string.");
     super({ tag, children });
   }
 
@@ -722,92 +724,26 @@ function parseXml(
       }
     }
 
-    function buildElementNode(
+    function parseNodeWithChildren<T extends XmlElementNode | XmlWrapperNode>(
       tag: string,
       attributes: Attributes,
-      children: XmlNode[]
-    ): XmlElementNode {
-      if (!options?.recycleNodes) return new XmlElementNode({
-        tag, attributes, children
-      });
-
-      const keySegments = [tag];
-
-      const attrSegments: string[] = [];
-      for (const attrKey in attributes) {
-        if (attrKey !== "n")
-          attrSegments.push(`${attrKey}=${attributes[attrKey]}`);
-      }
-      attrSegments.sort();
-      if (attrSegments.length) keySegments.push(attrSegments.join(","));
-
-      if (children.length) keySegments.push(children.map(child => {
-        const childRef = nodeCache.refMap.get(child);
-        childRef.refs++;
-        return childRef.id;
-      }).sort((a, b) => a - b).join(","));
-
-      const primaryKey = keySegments.join("&");
-
-      const nameMap = nodeCache.elements.get(primaryKey)
-        ?? new Map<string, RecycledNodeRef<XmlElementNode>>();
-
-      if (!nodeCache.elements.has(primaryKey))
-        nodeCache.elements.set(primaryKey, nameMap);
-
-      const nameKey = attributes.n ?? "";
-      if (nameMap.has(nameKey)) {
-        const nodeRef = nameMap.get(nameKey);
-        return nodeRef.node;
+      children: XmlNode[],
+      nodeMapping: RecycledNodeRefMap<T>,
+      newNodeGenerator: () => T
+    ): T {
+      if (!options?.recycleNodes) return newNodeGenerator();
+      const key = getRecycledNodeKey(nodeCache, tag, attributes, children);
+      if (nodeMapping.has(key)) {
+        return nodeMapping.get(key).node;
       } else {
-        // let idToUse: number;
-        // if (nameMap.size > 0) {
-        //   const [first] = nameMap.values();
-        //   idToUse = first.id;
-        // } else {
-        //   idToUse = nodeCache.nextId++;
-        // }
-
-        const nodeRef: RecycledNodeRef<XmlElementNode> = {
+        const nodeRef: any = {
           id: nodeCache.nextId++,
-          node: new XmlElementNode({ tag, attributes, children }),
+          node: newNodeGenerator(),
           refs: 0
         };
 
-        nameMap.set(nameKey, nodeRef);
-        nodeCache.refMap.set(nodeRef.node, nodeRef);
-        return nodeRef.node;
-      }
-    }
-
-    function buildWrapperNode(
-      tag: string,
-      children: XmlNode[]
-    ): XmlWrapperNode {
-      if (!options?.recycleNodes) return new XmlWrapperNode({
-        tag, children
-      });
-
-      const childIds = children.map(child => {
-        const childRef = nodeCache.refMap.get(child);
-        childRef.refs++;
-        return childRef.id;
-      }).sort((a, b) => a - b).join(",");
-
-      const key = childIds ? tag : `${tag}&${childIds}`;
-
-      if (nodeCache.wrappers.has(key)) {
-        const nodeRef = nodeCache.wrappers.get(key);
-        return nodeRef.node;
-      } else {
-        const nodeRef: RecycledNodeRef<XmlWrapperNode> = {
-          id: nodeCache.nextId++,
-          node: new XmlWrapperNode({ tag, children }),
-          refs: 0
-        };
-
-        nodeCache.wrappers.set(key, nodeRef);
-        nodeCache.refMap.set(nodeRef.node, nodeRef);
+        nodeMapping.set(key, nodeRef);
+        nodeMapping.set(nodeRef.node, nodeRef);
         return nodeRef.node;
       }
     }
@@ -844,10 +780,22 @@ function parseXml(
 
         if (isDeclaration) {
           declaration = attributes;
+        } else if (isWrapper) {
+          return parseNodeWithChildren(
+            tag,
+            attributes,
+            children,
+            nodeCache?.wrappers,
+            () => new XmlWrapperNode({ tag: attributes.tag, children })
+          );
         } else {
-          return isWrapper
-            ? buildWrapperNode(attributes.tag, children)
-            : buildElementNode(tag, attributes, children);
+          return parseNodeWithChildren(
+            tag,
+            attributes,
+            children,
+            nodeCache?.elements,
+            () => new XmlElementNode({ tag, attributes, children })
+          );
         }
       }
     }
@@ -1023,6 +971,41 @@ function getDefaultDeclaration(): Attributes {
     version: "1.0",
     encoding: "utf-8"
   };
+}
+
+/**
+ * Returns a unique string for nodes with the given arguments. 
+ * 
+ * Side effect: This will increment the `refs` count of each child node by 1.
+ * 
+ * @param nodeCache Cache being used to recycle nodes
+ * @param tag Tag of node
+ * @param attributes Optional object of attributes on node
+ * @param children List of child nodes
+ */
+function getRecycledNodeKey(
+  nodeCache: RecycledNodesCache,
+  tag: string,
+  attributes: Attributes,
+  children: XmlNode[],
+): string {
+  const keySegments = [tag];
+
+  if (attributes) {
+    const attrSegments: string[] = [];
+    for (const attrKey in attributes)
+      attrSegments.push(`${attrKey}=${attributes[attrKey]}`);
+    if (attrSegments.length)
+      keySegments.push(attrSegments.sort().join(","));
+  }
+
+  if (children?.length) keySegments.push(children.map(child => {
+    const childRef = nodeCache.refMap.get(child);
+    childRef.refs++;
+    return childRef.id;
+  }).sort((a, b) => a - b).join(","));
+
+  return keySegments.join("&");
 }
 
 //#endregion Helpers
