@@ -26,7 +26,7 @@
           "name": "elements",
           "description": "Mapping of element nodes.",
           "type": {
-            "name": "Map<string, Map<string, RecycledNodeRef<XmlElementNode>>>"
+            "name": "Map<string, RecycledNodeRef<XmlElementNode>>"
           }
         },
         {
