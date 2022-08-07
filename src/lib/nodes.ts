@@ -743,7 +743,7 @@ function parseXml(
         };
 
         nodeMapping.set(key, nodeRef);
-        nodeMapping.set(nodeRef.node, nodeRef);
+        nodeCache.refMap.set(nodeRef.node, nodeRef);
         return nodeRef.node;
       }
     }

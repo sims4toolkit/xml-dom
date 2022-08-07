@@ -379,6 +379,101 @@ describe('XmlDocumentNode', function () {
   });
 
   describe("#fromRecycled()", () => {
+    const getDocumentNode = (xml: string) => {
+      return XmlDocumentNode.fromRecycled(xml).doc;
+    };
+
+    context("value node", () => {
+      context("has same value", () => {
+        it("should be shared if in same element node", () => {
+          const doc = getDocumentNode(`<I>
+            <T>12345</T>
+            <T>12345</T>
+          </I>`);
+
+          const [first, second] = doc.child.children;
+          expect(first).to.equal(second);
+          expect(first.child).to.equal(second.child);
+        });
+
+        it("should be shared if in different element nodes", () => {
+          const doc = getDocumentNode(`<I>
+            <T n="a">12345</T>
+            <T n="b">12345</T>
+          </I>`);
+
+          const [first, second] = doc.child.children;
+          expect(first).to.not.equal(second);
+          expect(first.child).to.equal(second.child);
+        });
+      });
+
+      context("has different value", () => {
+        it("should not be shared if in different element nodes", () => {
+          const doc = getDocumentNode(`<I>
+            <T>12345</T>
+            <T>67890</T>
+          </I>`);
+
+          const [first, second] = doc.child.children;
+          expect(first).to.not.equal(second);
+          expect(first.child).to.not.equal(second.child);
+        });
+      });
+    });
+
+    context("comment node", () => {
+      context("has same value", () => {
+        it("should be shared if in same element node", () => {
+          const doc = getDocumentNode(`<I>
+            <T><!--12345--></T>
+            <T><!--12345--></T>
+          </I>`);
+
+          const [first, second] = doc.child.children;
+          expect(first).to.equal(second);
+          expect(first.child).to.equal(second.child);
+        });
+
+        it("should be shared if in different element nodes", () => {
+          const doc = getDocumentNode(`<I>
+            <T n="a"><!--12345--></T>
+            <T n="b"><!--12345--></T>
+          </I>`);
+
+          const [first, second] = doc.child.children;
+          expect(first).to.not.equal(second);
+          expect(first.child).to.equal(second.child);
+        });
+      });
+
+      context("has different value", () => {
+        it("should not be shared if in same element node", () => {
+          const doc = getDocumentNode(`<I>
+            <T><!--12345--></T>
+            <T><!--67890--></T>
+          </I>`);
+
+          const [first, second] = doc.child.children;
+          expect(first).to.not.equal(second);
+          expect(first.child).to.not.equal(second.child);
+        });
+
+        it("should not be shared if in different element nodes", () => {
+          const doc = getDocumentNode(`<I>
+            <T n="a"><!--12345--></T>
+            <T n="b"><!--67890--></T>
+          </I>`);
+
+          const [first, second] = doc.child.children;
+          expect(first).to.not.equal(second);
+          expect(first.child).to.not.equal(second.child);
+        });
+      });
+    });
+
+    // TODO:
+
     // TODO:
   });
 
