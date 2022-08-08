@@ -414,10 +414,10 @@ export class XmlDocumentNode extends XmlNodeBase {
     options: Omit<XmlParsingOptions, "recycleNodes"> = {}
   ): XmlParsingRecycledResult {
     (options as XmlParsingOptions).recycleNodes = true;
-    const { nodes, declaration, recylingCache } = parseXml(xml, options);
+    const { nodes, declaration, recyclingCache } = parseXml(xml, options);
     const doc = new XmlDocumentNode(undefined, { declaration });
     doc.children.push(...nodes);
-    return { doc, recylingCache };
+    return { doc, recyclingCache };
   }
 
   clone(): XmlDocumentNode {
@@ -796,7 +796,7 @@ function parseXml(
       return {
         nodes: parseNodeObjArray(nodeObjs),
         declaration,
-        recylingCache: options?.recycledNodesCache
+        recyclingCache: options?.recycledNodesCache
       };
     } catch (e) {
       if (e instanceof UnescapedProcessingInstructionsError) {
