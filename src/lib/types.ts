@@ -143,7 +143,7 @@ export interface XmlParsingResult {
    * The cache that was used to recycle nodes. Guaranteed to be defined if
    * `recycleNodes = true` was true when parsing.
    */
-  recylingCache?: RecycledNodesCache;
+  recyclingCache?: RecycledNodesCache;
 }
 
 /** The result of parsing XML with recycled cells. */
@@ -157,7 +157,7 @@ export interface XmlParsingRecycledResult {
    * The cache that was used to recycle nodes. Guaranteed to be defined if
    * `recycleNodes = true` was true when parsing.
    */
-  recylingCache: RecycledNodesCache;
+  recyclingCache: RecycledNodesCache;
 }
 
 /** Options to use when writing a node as an XML string. */

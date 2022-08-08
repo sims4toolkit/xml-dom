@@ -28,7 +28,7 @@
         },
         {
           "displayType": "property",
-          "name": "recylingCache",
+          "name": "recyclingCache",
           "description": "The cache that was used to recycle nodes. Guaranteed to be defined if recycleNodes = true was true when parsing.",
           "type": {
             "name": "RecycledNodesCache",
