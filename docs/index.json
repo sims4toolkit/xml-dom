@@ -22,7 +22,8 @@
         "XmlCommentNode",
         "XmlDocumentNode",
         "XmlElementNode",
-        "XmlValueNode"
+        "XmlValueNode",
+        "XmlWrapperNode"
       ]
     },
     {
