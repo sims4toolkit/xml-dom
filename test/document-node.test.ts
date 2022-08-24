@@ -507,6 +507,25 @@ describe('XmlDocumentNode', function () {
           const second = secondParent.child;
           expect(first).to.equal(second);
         });
+
+        it("should not be shared if children in different order", () => {
+          const root = getDocumentNode(`<I>
+            <U n="tuple">
+              <T n="tunable">first</T>
+              <T n="tunable">second</T>
+            </U>
+            <U n="tuple">
+              <T n="tunable">second</T>
+              <T n="tunable">first</T>
+            </U>
+          </I>`).child;
+
+          const [firstParent, secondParent] = root.children;
+          expect(firstParent).to.not.equal(secondParent);
+          const firstFirst = firstParent.child;
+          const secondFirst = secondParent.children[1];
+          expect(firstFirst).to.equal(secondFirst);
+        });
       });
 
       context("has different tag", () => {

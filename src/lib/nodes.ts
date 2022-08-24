@@ -1095,7 +1095,7 @@ function getRecycledNodeKey(
     const childRef = nodeCache.refMap.get(child);
     childRef.refs++;
     return childRef.id;
-  }).sort((a, b) => a - b).join(","));
+  }).join(","));
 
   return keySegments.join("&");
 }
