@@ -395,9 +395,15 @@ abstract class XmlNodeBase implements XmlNode {
     // guaranteed to have attributes
     const thisKeys = Object.keys(this.attributes);
     const otherKeys = Object.keys(other.attributes);
-    if (thisKeys.length !== otherKeys.length) return false;
 
-    for (const key in this.attributes) {
+    // this looks weird, but you can't just iterate through one of the objects
+    // because the other one might have additional attributes that this one is
+    // missing, and you can't check that the length of thisKeys is the same as
+    // that of otherKeys, because the length descrepancy might be due to attrs
+    // that are excluded
+    const keysToCheck = [...new Set([...thisKeys, ...otherKeys])];
+    for (let i = 0; i < keysToCheck.length; ++i) {
+      const key = keysToCheck[i];
       if (options?.excludeAttributes?.includes(key)) continue;
       if (options?.excludeAttributesRecursive?.includes(key)) continue;
       if (this.attributes[key] !== other.attributes[key]) return false;
