@@ -192,6 +192,36 @@
         },
         {
           "displayType": "function",
+          "name": "equals",
+          "description": "Returns true if this node has the same tag, attributes, value, and children as the other one. Options can be configured to ignore children or specific attributes.",
+          "arguments": [
+            {
+              "name": "other",
+              "description": "Other node to compare.",
+              "type": {
+                "name": "XmlNode"
+              }
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "description": "Object containing optional arguments.",
+              "type": {
+                "name": "XmlNodeComparisonOptions",
+                "path": {
+                  "pkg": "xml-dom",
+                  "group": "types",
+                  "item": "XmlNodeComparisonOptions"
+                }
+              }
+            }
+          ],
+          "returnType": {
+            "name": "boolean"
+          }
+        },
+        {
+          "displayType": "function",
           "name": "findChild",
           "description": "Finds and returns the first child that has the given name. If no children have this name, undefined is returned. If this node cannot have children, an exception is thrown.",
           "arguments": [
