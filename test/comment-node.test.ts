@@ -190,7 +190,7 @@ describe('XmlCommentNode', function () {
     });
   });
 
-  describe("equals()", () => {
+  describe("#equals()", () => {
     it("should return false when other is an element node with the same inner value", () => {
       const thisNode = new XmlCommentNode("test");
       const otherNode = new XmlElementNode({

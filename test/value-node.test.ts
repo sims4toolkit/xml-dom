@@ -192,7 +192,7 @@ describe('XmlValueNode', function () {
     });
   });
 
-  describe("equals()", () => {
+  describe("#equals()", () => {
     it("should return false when other is an element node with the same inner value", () => {
       const thisNode = new XmlValueNode("test");
       const otherNode = new XmlElementNode({
