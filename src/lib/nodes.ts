@@ -420,7 +420,8 @@ abstract class XmlNodeBase implements XmlNode {
 
     const childEqualsArgs: XmlNodeComparisonOptions = {
       excludeAttributesRecursive: options?.excludeAttributesRecursive,
-      recursionLevels: nextRecursionLevels
+      recursionLevels: nextRecursionLevels,
+      strictTypes: options?.strictTypes
     };
 
     for (let i = 0; i < this.numChildren; ++i) {

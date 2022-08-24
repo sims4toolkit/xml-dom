@@ -702,7 +702,31 @@ describe('XmlElementNode', function () {
 
     context("strictTypes", () => {
       it("should be passed on to child nodes", () => {
-        // TODO:
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          attributes: {
+            n: "some_list"
+          },
+          children: [
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(true)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(123)] }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          attributes: {
+            n: "some_list"
+          },
+          children: [
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode("True")] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode("123")] }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode)).to.be.true;
+        expect(thisNode.equals(otherNode, { strictTypes: false })).to.be.true;
+        expect(thisNode.equals(otherNode, { strictTypes: true })).to.be.false;
       });
     });
   });
