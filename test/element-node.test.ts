@@ -709,15 +709,43 @@ describe('XmlElementNode', function () {
 
       context("other has a subset of this's attributes", () => {
         it("should return true if the missing attr is excluded", () => {
-          // TODO:
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              t: "enabled"
+            }
+          });
+
+          expect(otherNode.equals(thisNode, {
+            excludeAttributes: ["n"]
+          })).to.be.true;
         });
 
         it("should return false if the missing attr is not excluded", () => {
-          // TODO:
-        });
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
 
-        it("should return false if no attrs are excluded", () => {
-          // TODO:
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              t: "enabled"
+            }
+          });
+
+          expect(otherNode.equals(thisNode)).to.be.false;
         });
       });
     });
