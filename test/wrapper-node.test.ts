@@ -406,6 +406,24 @@ describe("XmlWrapperNode", () => {
     });
   });
 
+  describe("#equals()", () => {
+    it("should be false if other is an element with same tag & children", () => {
+      // TODO:
+    });
+
+    it("should be false if other is a wrapper with different tag", () => {
+      // TODO:
+    });
+
+    it("should be false if other is a wrapper with different children", () => {
+      // TODO:
+    });
+
+    // NOTE: Most child logic is tested in XmlElementNode, no need to re-write
+    // the same tests here (especially when XmlWrapperNodes are like... never
+    // going to be compared, ever).
+  });
+
   describe("#findChild()", () => {
     it("should return undefined if the child doesn't exist", () => {
       const node = new XmlWrapperNode({
