@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { XmlElementNode, XmlValueNode } from "../dst/xml";
+import { XmlCommentNode, XmlElementNode, XmlValueNode } from "../dst/xml";
 
 describe('XmlValueNode', function () {
   const newNode = (value: any = "test") => new XmlValueNode(value);
@@ -200,6 +200,12 @@ describe('XmlValueNode', function () {
         children: [thisNode]
       });
 
+      expect(thisNode.equals(otherNode)).to.be.false;
+    });
+
+    it("should return false when other is a comment node with the same value", () => {
+      const thisNode = new XmlValueNode("test");
+      const otherNode = new XmlCommentNode("test");
       expect(thisNode.equals(otherNode)).to.be.false;
     });
 
