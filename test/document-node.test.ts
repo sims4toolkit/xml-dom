@@ -1141,11 +1141,30 @@ describe('XmlDocumentNode', function () {
 
   describe("#equals()", () => {
     it("should be true for another document with the same tag, attrs, and root", () => {
-      // TODO:
+      const thisDoc = XmlDocumentNode.from(`<I n="something"><T>500</T></I>`);
+      const otherDoc = XmlDocumentNode.from(`<I n="something"><T>500</T></I>`);
+      expect(thisDoc.equals(otherDoc)).to.be.true;
     });
 
     it("should be false for the element node that is this document's root", () => {
-      // TODO:
+      const element = new XmlElementNode({
+        tag: "I",
+        attributes: {
+          n: "something"
+        },
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("500")
+            ]
+          })
+        ]
+      });
+
+      const doc = new XmlDocumentNode(element);
+
+      expect(doc.equals(element)).to.be.false;
     });
 
     // NOTE: child/attribute logic is tested more thoroughly in XmlElementNode,

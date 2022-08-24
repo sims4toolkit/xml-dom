@@ -408,15 +408,57 @@ describe("XmlWrapperNode", () => {
 
   describe("#equals()", () => {
     it("should be false if other is an element with same tag & children", () => {
-      // TODO:
+      const wrapper = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({ tag: "T", children: [new XmlValueNode(123)] })
+        ]
+      });
+
+      const element = new XmlElementNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({ tag: "T", children: [new XmlValueNode(123)] })
+        ]
+      });
+
+      expect(wrapper.equals(element)).to.be.false;
     });
 
     it("should be false if other is a wrapper with different tag", () => {
-      // TODO:
+      const thisWrapper = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({ tag: "T", children: [new XmlValueNode(123)] })
+        ]
+      });
+
+      const otherWrapper = new XmlWrapperNode({
+        tag: "something",
+        children: [
+          new XmlElementNode({ tag: "T", children: [new XmlValueNode(123)] })
+        ]
+      });
+
+      expect(thisWrapper.equals(otherWrapper)).to.be.false;
     });
 
     it("should be false if other is a wrapper with different children", () => {
-      // TODO:
+      const thisWrapper = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({ tag: "T", children: [new XmlValueNode(123)] })
+        ]
+      });
+
+      const otherWrapper = new XmlWrapperNode({
+        tag: "ignore",
+        children: [
+          new XmlElementNode({ tag: "T", children: [new XmlValueNode(456)] })
+        ]
+      });
+
+      expect(thisWrapper.equals(otherWrapper)).to.be.false;
     });
 
     // NOTE: child/attribute logic is tested more thoroughly in XmlElementNode,
