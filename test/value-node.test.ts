@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { XmlValueNode } from "../dst/xml";
+import { XmlElementNode, XmlValueNode } from "../dst/xml";
 
 describe('XmlValueNode', function () {
   const newNode = (value: any = "test") => new XmlValueNode(value);
@@ -189,6 +189,79 @@ describe('XmlValueNode', function () {
     it('should throw', function () {
       const node = newNode();
       expect(() => node.deepSort()).to.throw();
+    });
+  });
+
+  describe("equals()", () => {
+    it("should return false when other is an element node with the same inner value", () => {
+      const thisNode = new XmlValueNode("test");
+      const otherNode = new XmlElementNode({
+        tag: "T",
+        children: [thisNode]
+      });
+
+      expect(thisNode.equals(otherNode)).to.be.false;
+    });
+
+    it("should return false when other is a value node with different value", () => {
+      const thisNode = new XmlValueNode("test1");
+      const otherNode = new XmlValueNode("test2");
+      expect(thisNode.equals(otherNode)).to.be.false;
+    });
+
+    it("should return true when other is the exact same object", () => {
+      const node = new XmlValueNode("test");
+      expect(node.equals(node)).to.be.true;
+    });
+
+    it("should return true when other is a value node with the same value", () => {
+      const thisNode = new XmlValueNode("test");
+      const otherNode = new XmlValueNode("test");
+      expect(thisNode.equals(otherNode)).to.be.true;
+    });
+
+    it("should return true for `true` and \"True\" if strictTypes unsupplied", () => {
+      const thisNode = new XmlValueNode(true);
+      const otherNode = new XmlValueNode("True");
+      expect(thisNode.equals(otherNode)).to.be.true;
+    });
+
+    it("should return true for `true` and \"True\" if strictTypes = false", () => {
+      const thisNode = new XmlValueNode(true);
+      const otherNode = new XmlValueNode("True");
+      expect(thisNode.equals(otherNode, {
+        strictTypes: false
+      })).to.be.true;
+    });
+
+    it("should return false for `true` and \"True\" if strictTypes = true", () => {
+      const thisNode = new XmlValueNode(true);
+      const otherNode = new XmlValueNode("True");
+      expect(thisNode.equals(otherNode, {
+        strictTypes: true
+      })).to.be.false;
+    });
+
+    it("should return true for `123` and \"123\" if strictTypes unsupplied", () => {
+      const thisNode = new XmlValueNode(123);
+      const otherNode = new XmlValueNode("123");
+      expect(thisNode.equals(otherNode)).to.be.true;
+    });
+
+    it("should return true for `123` and \"123\" if strictTypes = false", () => {
+      const thisNode = new XmlValueNode(123);
+      const otherNode = new XmlValueNode("123");
+      expect(thisNode.equals(otherNode, {
+        strictTypes: false
+      })).to.be.true;
+    });
+
+    it("should return false for `123` and \"123\" if strictTypes = true", () => {
+      const thisNode = new XmlValueNode(123);
+      const otherNode = new XmlValueNode("123");
+      expect(thisNode.equals(otherNode, {
+        strictTypes: true
+      })).to.be.false;
     });
   });
 

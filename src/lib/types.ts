@@ -97,6 +97,52 @@ export interface RecycledNodesCache {
   wrappers: RecycledNodeRefMap<XmlWrapperNode>;
 }
 
+/** Object of options to set when comparing XML nodes. */
+export interface XmlNodeComparisonOptions extends Partial<{
+  /**
+   * An array containing the keys of attributes that should be ignored. That is,
+   * the result should be true even if the values for one of the listed
+   * attributes are not equal.
+   * 
+   * This option applies only to the highest-level node, that is, the one the
+   * `equal()` method is called on. To ignore attributes in all descending
+   * nodes, use `excludeAttributesRecursive`.
+   */
+  excludeAttributes: string[];
+
+  /**
+   * An array containing the keys of attributes that should be ignored. That is,
+   * the result should be true even if the values for one of the listed
+   * attributes are not equal.
+   * 
+   * This option applies to all descending nodes. To target the top-level node
+   * only, use `excludeAttributes`.
+   */
+  excludeAttributesRecursive: string[];
+
+  /**
+   * The number of times the comparison should recur (i.e. how many levels of
+   * child nodes should be considered). A value of 0 means only the parent node
+   * will be compared, while 1 means that only it and its immediate child will
+   * be, and so on. If not provided, then ALL descendants will be compared. 
+   */
+  recursionLevels: number;
+
+  /**
+   * If true, then values within value nodes must be the exact same type, and
+   * equality is dictated by the `===` operator. If false, then values are
+   * compared by using the string value they are rendered as in `toXml()`.
+   * 
+   * 
+   * Example: The boolean value `true` is rendered as `"True"` in `toXml()`, so
+   * `true` equals `"True"` if `strictTypes: false`. If `strictTypes: true`,
+   * then `true` does NOT equal `"True"`, because one is a boolean and the other
+   * is a string. This same logic applies to numbers/bigints vs. their
+   * stringified counterparts, such as `123` and `"123"`.
+   */
+  strictTypes: boolean;
+}> { }
+
 /** Options to use when reading XML from a string/buffer. */
 export interface XmlParsingOptions extends Partial<{
   /**
