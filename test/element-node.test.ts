@@ -623,29 +623,87 @@ describe('XmlElementNode', function () {
 
       context("this and other have the same attribute keys", () => {
         it("should return true if mismatched attrs are excluded", () => {
-          // TODO:
-        });
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "first_variant",
+              t: "enabled"
+            }
+          });
 
-        it("should return false if at least one mismatched attr is not excluded", () => {
-          // TODO:
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "second_variant",
+              t: "enabled"
+            }
+          });
+
+          expect(thisNode.equals(otherNode, {
+            excludeAttributes: ["n"]
+          })).to.be.true;
         });
 
         it("should return false if no attrs are excluded", () => {
-          // TODO:
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "first_variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "second_variant",
+              t: "enabled"
+            }
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
         });
       });
 
       context("this has a subset of other's attributes", () => {
         it("should return true if the missing attr is excluded", () => {
-          // TODO:
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              t: "enabled"
+            }
+          });
+
+          expect(thisNode.equals(otherNode, {
+            excludeAttributes: ["n"]
+          })).to.be.true;
         });
 
         it("should return false if the missing attr is not excluded", () => {
-          // TODO:
-        });
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
 
-        it("should return false if no attrs are excluded", () => {
-          // TODO:
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              t: "enabled"
+            }
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
         });
       });
 
