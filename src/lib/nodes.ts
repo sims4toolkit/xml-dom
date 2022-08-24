@@ -504,6 +504,10 @@ export class XmlDocumentNode extends XmlNodeBase {
     return clone;
   }
 
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlDocumentNode) && super.equals(other, options);
+  }
+
   toXml(options: XmlFormattingOptions = {}): string {
     const completeOptions = getCompleteOptions(options);
     const spaces = getSpaces(completeOptions);
@@ -548,6 +552,10 @@ export class XmlElementNode extends XmlNodeBase {
       attributes: Object.assign({}, this.attributes),
       children: this.children.map(child => child.clone())
     });
+  }
+
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlElementNode) && super.equals(other, options);
   }
 
   toXml(options: XmlElementFormattingOptions = {}): string {
@@ -602,6 +610,10 @@ export class XmlValueNode extends XmlNodeBase {
     return new XmlValueNode(this.value);
   }
 
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlValueNode) && super.equals(other, options);
+  }
+
   toXml(options: XmlValueFormattingOptions = {}): string {
     if (this.value == undefined) return "";
     const completeOptions = getCompleteOptions(options);
@@ -618,6 +630,10 @@ export class XmlCommentNode extends XmlNodeBase {
 
   clone(): XmlCommentNode {
     return new XmlCommentNode(this.value as string);
+  }
+
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlCommentNode) && super.equals(other, options);
   }
 
   toXml(options: XmlValueFormattingOptions = {}): string {
@@ -655,6 +671,10 @@ export class XmlWrapperNode extends XmlNodeBase {
       tag: this.tag,
       children: this.children.map(child => child.clone())
     });
+  }
+
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlWrapperNode) && super.equals(other, options);
   }
 
   toXml(options: XmlValueFormattingOptions = {}): string {
