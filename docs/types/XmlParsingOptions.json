@@ -34,7 +34,7 @@
           "displayType": "property",
           "name": "recycledNodesCache",
           "optional": true,
-          "description": "An object that is used to keep track of recycled nodes. This does not need to be provided by the user; it will be generated if recycleNodes = true.",
+          "description": "An object that is used to keep track of recycled nodes. This does not need to be provided by the user; it will be generated if recycleNodes = true. If provided, recycledNodesSeed will be ignored.",
           "type": {
             "name": "RecycledNodesCache",
             "path": {
@@ -51,6 +51,15 @@
           "description": "Whether or not nodes that share the exact same structure should be loaded once and only once. This should never be true if you intend on modifying the DOM at all, as doing so can lead to unintended side effects. False by default.",
           "type": {
             "name": "boolean"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "recycleNodesSeed",
+          "optional": true,
+          "description": "The seed to use for recycled node IDs. This should be a unique 64-bit integer that ends with 20 null bits. If not provided, the seed is 0. If recycledNodesCache is provided, then this argument is ignored.\n\nNOTE: It is very, very important to provide a unique seed when generating combined tuning. Using a seed of 0 will cause collisions between the generated combined tuning and combined tuning in the BG.",
+          "type": {
+            "name": "bigint"
           }
         }
       ]

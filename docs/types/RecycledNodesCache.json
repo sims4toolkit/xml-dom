@@ -42,7 +42,7 @@
           "name": "nextId",
           "description": "The unique ID to use for the next node.",
           "type": {
-            "name": "number"
+            "name": "bigint"
           }
         },
         {

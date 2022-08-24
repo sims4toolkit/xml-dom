@@ -746,6 +746,22 @@ describe('XmlDocumentNode', function () {
         });
       });
     });
+
+    it("should use the provided seed", () => {
+      const xml = `<L><T>VALUE</T><T>VALUE</T></L>`;
+      const seed = 1000000n;
+
+      const { recyclingCache } = XmlDocumentNode.fromRecycled(xml, {
+        recycledNodesSeed: seed
+      });
+
+      const refs = [...recyclingCache.refMap.values()];
+
+      for (let i = 0; i < refs.length; ++i) {
+        const ref = refs[i];
+        expect(ref.id).to.equal(seed + BigInt(i))
+      }
+    });
   });
 
   //#endregion Initialization
