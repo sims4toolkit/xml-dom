@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { XmlElementNode, XmlValueNode, XmlCommentNode, XmlWrapperNode } from "../dst/xml";
+import { XmlElementNode, XmlValueNode, XmlCommentNode, XmlWrapperNode, XmlDocumentNode } from "../dst/xml";
 
 describe('XmlElementNode', function () {
   const newNode = (tag = "T") => new XmlElementNode({ tag });
@@ -442,25 +442,77 @@ describe('XmlElementNode', function () {
   describe("#equals()", () => {
     context("other has same tag, attrs, and children", () => {
       it("should return true", () => {
-        // TODO:
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          attributes: {
+            n: "some_list"
+          },
+          children: [
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(1)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(2)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(3)] }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          attributes: {
+            n: "some_list"
+          },
+          children: [
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(1)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(2)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(3)] }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode)).to.be.true;
       });
     });
 
     context("other is not an XmlElementNode", () => {
       it("should be false if other is a wrapper node with same tag & children", () => {
-        // TODO:
+        const child = new XmlValueNode("test");
+
+        const element = new XmlElementNode({
+          tag: "T",
+          children: [child]
+        });
+
+        const wrapper = new XmlWrapperNode({
+          tag: "T",
+          children: [child]
+        });
+
+        expect(element.equals(wrapper)).to.be.false;
       });
 
       it("should be false if other is a value node with same inner value", () => {
-        // TODO:
+        const child = new XmlValueNode("test");
+
+        const element = new XmlElementNode({
+          tag: "T",
+          children: [child]
+        });
+
+        expect(element.equals(child)).to.be.false;
       });
 
       it("should be false if other is a comment node with same inner value", () => {
-        // TODO:
+        const comment = new XmlCommentNode("test");
+
+        const element = new XmlElementNode({
+          tag: "T",
+          children: [comment]
+        });
+
+        expect(element.equals(comment)).to.be.false;
       });
 
       it("should be false if other is a document that contains this element as its root", () => {
-        // TODO:
+        const root = new XmlElementNode({ tag: "T" });
+        const doc = new XmlDocumentNode(root);
+        expect(root.equals(doc)).to.be.false;
       });
     });
 
