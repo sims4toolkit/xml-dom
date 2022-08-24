@@ -507,6 +507,25 @@ describe('XmlDocumentNode', function () {
           const second = secondParent.child;
           expect(first).to.equal(second);
         });
+
+        it("should not be shared if children in different order", () => {
+          const root = getDocumentNode(`<I>
+            <U n="tuple">
+              <T n="tunable">first</T>
+              <T n="tunable">second</T>
+            </U>
+            <U n="tuple">
+              <T n="tunable">second</T>
+              <T n="tunable">first</T>
+            </U>
+          </I>`).child;
+
+          const [firstParent, secondParent] = root.children;
+          expect(firstParent).to.not.equal(secondParent);
+          const firstFirst = firstParent.child;
+          const secondFirst = secondParent.children[1];
+          expect(firstFirst).to.equal(secondFirst);
+        });
       });
 
       context("has different tag", () => {
@@ -1118,6 +1137,38 @@ describe('XmlDocumentNode', function () {
       expect(node.child.children[1].attributes.x).to.equal("b");
       expect(node.child.children[2].attributes.x).to.equal("c");
     });
+  });
+
+  describe("#equals()", () => {
+    it("should be true for another document with the same tag, attrs, and root", () => {
+      const thisDoc = XmlDocumentNode.from(`<I n="something"><T>500</T></I>`);
+      const otherDoc = XmlDocumentNode.from(`<I n="something"><T>500</T></I>`);
+      expect(thisDoc.equals(otherDoc)).to.be.true;
+    });
+
+    it("should be false for the element node that is this document's root", () => {
+      const element = new XmlElementNode({
+        tag: "I",
+        attributes: {
+          n: "something"
+        },
+        children: [
+          new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("500")
+            ]
+          })
+        ]
+      });
+
+      const doc = new XmlDocumentNode(element);
+
+      expect(doc.equals(element)).to.be.false;
+    });
+
+    // NOTE: child/attribute logic is tested more thoroughly in XmlElementNode,
+    // and all XmlNodes shared the exact same code for these functions
   });
 
   describe("#findChild()", () => {

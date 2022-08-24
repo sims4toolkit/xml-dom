@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "interface",
+      "name": "XmlNodeComparisonOptions"
+    },
+    "description": "Object of options to set when comparing XML nodes.",
+    "sourceCode": "src/lib/types.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "name": "excludeAttributes",
+          "optional": true,
+          "description": "An array containing the keys of attributes that should be ignored. That is, the result should be true even if the values for one of the listed attributes are not equal.\n\nThis option applies only to the highest-level node, that is, the one the equal() method is called on. To ignore attributes in all descending nodes, use excludeAttributesRecursive.",
+          "type": {
+            "name": "string[]"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "excludeAttributesRecursive",
+          "optional": true,
+          "description": "An array containing the keys of attributes that should be ignored. That is, the result should be true even if the values for one of the listed attributes are not equal.\n\nThis option applies to all descending nodes. To target the top-level node only, use excludeAttributes.",
+          "type": {
+            "name": "string[]"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "recursionLevels",
+          "optional": true,
+          "description": "The number of times the comparison should recur (i.e. how many levels of child nodes should be considered). A value of 0 means only the parent node will be compared, while 1 means that only it and its immediate child will be, and so on. If not provided, then ALL descendants will be compared.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "strictTypes",
+          "optional": true,
+          "description": "If true, then values within value nodes must be the exact same type, and equality is dictated by the === operator. If false, then values are compared by using the string value they are rendered as in toXml().\n\nExample: The boolean value true is rendered as \"True\" in toXml(), so true equals \"True\" if strictTypes: false. If strictTypes: true, then true does NOT equal \"True\", because one is a boolean and the other is a string. This same logic applies to numbers/bigints vs. their stringified counterparts, such as 123 and \"123\".",
+          "type": {
+            "name": "boolean"
+          }
+        }
+      ]
+    }
+  ]
+}

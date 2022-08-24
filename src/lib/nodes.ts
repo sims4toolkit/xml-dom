@@ -7,6 +7,7 @@ import type {
   RecycledNodesCache,
   XmlElementFormattingOptions,
   XmlFormattingOptions,
+  XmlNodeComparisonOptions,
   XmlParsingOptions,
   XmlParsingRecycledResult,
   XmlParsingResult,
@@ -135,6 +136,16 @@ export interface XmlNode {
    * @throws If this node cannot have children
    */
   deepSort(compareFn?: (a: XmlNode, b: XmlNode) => number): void;
+
+  /**
+   * Returns true if this node has the same tag, attributes, value, and children
+   * as the other one. Options can be configured to ignore children or specific
+   * attributes.
+   * 
+   * @param other Other node to compare
+   * @param options Object containing optional arguments
+   */
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean;
 
   /**
    * Finds and returns the first child that has the given name. If no children
@@ -315,6 +326,28 @@ abstract class XmlNodeBase implements XmlNode {
     });
   }
 
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    if (!(other instanceof XmlNodeBase)) return false;
+    if (this === other) return true;
+    if (this.tag !== other.tag) return false;
+
+    if (options?.strictTypes) {
+      if (this.value !== other.value) return false;
+    } else {
+      if (formatValue(this.value) !== formatValue(other.value)) return false;
+    }
+
+    if (this._attributes) {
+      if (!(other._attributes && this._attributesAreEqual(other, options)))
+        return false;
+    } else if (other._attributes) {
+      return false;
+    }
+
+    return (options?.recursionLevels === 0)
+      || this._childrenAreEqual(other, options);
+  }
+
   findChild(name: string): XmlNode {
     if (!this.hasChildren)
       throw new Error("Cannot find child for childless node.");
@@ -353,6 +386,57 @@ abstract class XmlNodeBase implements XmlNode {
   private _ensureChildren() {
     if (!this.hasChildren)
       throw new Error("Cannot mutate children of childless node.");
+  }
+
+  private _attributesAreEqual(
+    other: XmlNode,
+    options?: XmlNodeComparisonOptions
+  ): boolean {
+    // guaranteed to have attributes
+    const thisKeys = Object.keys(this.attributes);
+    const otherKeys = Object.keys(other.attributes);
+
+    // this looks weird, but you can't just iterate through one of the objects
+    // because the other one might have additional attributes that this one is
+    // missing, and you can't check that the length of thisKeys is the same as
+    // that of otherKeys, because the length descrepancy might be due to attrs
+    // that are excluded
+    const keysToCheck = [...new Set([...thisKeys, ...otherKeys])];
+    for (let i = 0; i < keysToCheck.length; ++i) {
+      const key = keysToCheck[i];
+      if (options?.excludeAttributes?.includes(key)) continue;
+      if (options?.excludeAttributesRecursive?.includes(key)) continue;
+      if (this.attributes[key] !== other.attributes[key]) return false;
+    }
+
+    return true;
+  }
+
+  private _childrenAreEqual(
+    other: XmlNode,
+    options?: XmlNodeComparisonOptions
+  ): boolean {
+    if (this.numChildren !== other.numChildren) return false;
+    if (this.numChildren === 0) return true;
+
+    // recursionLevels guaranteed to not be 0, falsey means undefined/null
+    const nextRecursionLevels = options?.recursionLevels
+      ? options.recursionLevels - 1
+      : options?.recursionLevels;
+
+    const childEqualsArgs: XmlNodeComparisonOptions = {
+      excludeAttributesRecursive: options?.excludeAttributesRecursive,
+      recursionLevels: nextRecursionLevels,
+      strictTypes: options?.strictTypes
+    };
+
+    for (let i = 0; i < this.numChildren; ++i) {
+      const thisChild = this.children[i];
+      const otherChild = other.children[i];
+      if (!thisChild.equals(otherChild, childEqualsArgs)) return false;
+    }
+
+    return true;
   }
 
   //#endregion Private Methods
@@ -427,6 +511,10 @@ export class XmlDocumentNode extends XmlNodeBase {
     return clone;
   }
 
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlDocumentNode) && super.equals(other, options);
+  }
+
   toXml(options: XmlFormattingOptions = {}): string {
     const completeOptions = getCompleteOptions(options);
     const spaces = getSpaces(completeOptions);
@@ -471,6 +559,10 @@ export class XmlElementNode extends XmlNodeBase {
       attributes: Object.assign({}, this.attributes),
       children: this.children.map(child => child.clone())
     });
+  }
+
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlElementNode) && super.equals(other, options);
   }
 
   toXml(options: XmlElementFormattingOptions = {}): string {
@@ -525,6 +617,10 @@ export class XmlValueNode extends XmlNodeBase {
     return new XmlValueNode(this.value);
   }
 
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlValueNode) && super.equals(other, options);
+  }
+
   toXml(options: XmlValueFormattingOptions = {}): string {
     if (this.value == undefined) return "";
     const completeOptions = getCompleteOptions(options);
@@ -541,6 +637,10 @@ export class XmlCommentNode extends XmlNodeBase {
 
   clone(): XmlCommentNode {
     return new XmlCommentNode(this.value as string);
+  }
+
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlCommentNode) && super.equals(other, options);
   }
 
   toXml(options: XmlValueFormattingOptions = {}): string {
@@ -578,6 +678,10 @@ export class XmlWrapperNode extends XmlNodeBase {
       tag: this.tag,
       children: this.children.map(child => child.clone())
     });
+  }
+
+  equals(other: XmlNode, options?: XmlNodeComparisonOptions): boolean {
+    return (other instanceof XmlWrapperNode) && super.equals(other, options);
   }
 
   toXml(options: XmlValueFormattingOptions = {}): string {
@@ -991,7 +1095,7 @@ function getRecycledNodeKey(
     const childRef = nodeCache.refMap.get(child);
     childRef.refs++;
     return childRef.id;
-  }).sort((a, b) => a - b).join(","));
+  }).join(","));
 
   return keySegments.join("&");
 }

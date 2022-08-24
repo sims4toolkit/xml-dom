@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { XmlElementNode, XmlValueNode, XmlCommentNode, XmlWrapperNode } from "../dst/xml";
+import { XmlElementNode, XmlValueNode, XmlCommentNode, XmlWrapperNode, XmlDocumentNode } from "../dst/xml";
 
 describe('XmlElementNode', function () {
   const newNode = (tag = "T") => new XmlElementNode({ tag });
@@ -436,6 +436,1040 @@ describe('XmlElementNode', function () {
       expect(second.children[0].name).to.equal("a");
       expect(second.children[1].name).to.equal("b");
       expect(second.children[2].name).to.equal("c");
+    });
+  });
+
+  describe("#equals()", () => {
+    context("other has same tag, attrs, and children", () => {
+      it("should return true", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          attributes: {
+            n: "some_list"
+          },
+          children: [
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(1)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(2)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(3)] }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          attributes: {
+            n: "some_list"
+          },
+          children: [
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(1)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(2)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(3)] }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode)).to.be.true;
+      });
+    });
+
+    context("other is not an XmlElementNode", () => {
+      it("should be false if other is a wrapper node with same tag & children", () => {
+        const child = new XmlValueNode("test");
+
+        const element = new XmlElementNode({
+          tag: "T",
+          children: [child]
+        });
+
+        const wrapper = new XmlWrapperNode({
+          tag: "T",
+          children: [child]
+        });
+
+        expect(element.equals(wrapper)).to.be.false;
+      });
+
+      it("should be false if other is a value node with same inner value", () => {
+        const child = new XmlValueNode("test");
+
+        const element = new XmlElementNode({
+          tag: "T",
+          children: [child]
+        });
+
+        expect(element.equals(child)).to.be.false;
+      });
+
+      it("should be false if other is a comment node with same inner value", () => {
+        const comment = new XmlCommentNode("test");
+
+        const element = new XmlElementNode({
+          tag: "T",
+          children: [comment]
+        });
+
+        expect(element.equals(comment)).to.be.false;
+      });
+
+      it("should be false if other is a document that contains this element as its root", () => {
+        const root = new XmlElementNode({ tag: "T" });
+        const doc = new XmlDocumentNode(root);
+        expect(root.equals(doc)).to.be.false;
+      });
+    });
+
+    context("other has different tag", () => {
+      it("should return false", () => {
+        const thisNode = new XmlElementNode({ tag: "T" });
+        const otherNode = new XmlElementNode({ tag: "L" });
+        expect(thisNode.equals(otherNode)).to.be.false;
+      });
+    });
+
+    context("other has different attributes", () => {
+      context("this has attributes, other doesn't", () => {
+        it("should return true if all of this's attrs are excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({ tag: "V" });
+
+          expect(thisNode.equals(otherNode, {
+            excludeAttributes: ["n", "t"]
+          })).to.be.true;
+        });
+
+        it("should return false if at least one of this's attrs are not excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({ tag: "V" });
+
+          expect(thisNode.equals(otherNode, {
+            excludeAttributes: ["n"]
+          })).to.be.false;
+        });
+
+        it("should return false if no attrs are excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({ tag: "V" });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
+        });
+      });
+
+      context("this has no attributes, other does", () => {
+        it("should return true if all of other's attrs are excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({ tag: "V" });
+
+          expect(otherNode.equals(thisNode, {
+            excludeAttributes: ["n", "t"]
+          })).to.be.true;
+        });
+
+        it("should return false if at least one of other's attrs are not excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({ tag: "V" });
+
+          expect(otherNode.equals(thisNode, {
+            excludeAttributes: ["n"]
+          })).to.be.false;
+        });
+
+        it("should return false if no attrs are excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({ tag: "V" });
+
+          expect(otherNode.equals(thisNode)).to.be.false;
+        });
+      });
+
+      context("this and other have the same attribute keys", () => {
+        it("should return true if mismatched attrs are excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "first_variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "second_variant",
+              t: "enabled"
+            }
+          });
+
+          expect(thisNode.equals(otherNode, {
+            excludeAttributes: ["n"]
+          })).to.be.true;
+        });
+
+        it("should return false if no attrs are excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "first_variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "second_variant",
+              t: "enabled"
+            }
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
+        });
+      });
+
+      context("this has a subset of other's attributes", () => {
+        it("should return true if the missing attr is excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              t: "enabled"
+            }
+          });
+
+          expect(thisNode.equals(otherNode, {
+            excludeAttributes: ["n"]
+          })).to.be.true;
+        });
+
+        it("should return false if the missing attr is not excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              t: "enabled"
+            }
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
+        });
+      });
+
+      context("other has a subset of this's attributes", () => {
+        it("should return true if the missing attr is excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              t: "enabled"
+            }
+          });
+
+          expect(otherNode.equals(thisNode, {
+            excludeAttributes: ["n"]
+          })).to.be.true;
+        });
+
+        it("should return false if the missing attr is not excluded", () => {
+          const thisNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              n: "variant",
+              t: "enabled"
+            }
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "V",
+            attributes: {
+              t: "enabled"
+            }
+          });
+
+          expect(otherNode.equals(thisNode)).to.be.false;
+        });
+      });
+    });
+
+    context("other has different children", () => {
+      context("this has children, other doesn't", () => {
+        it("should return true when not recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "T",
+            children: [new XmlValueNode("test")]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "T",
+            children: []
+          });
+
+          expect(thisNode.equals(otherNode, {
+            recursionLevels: 0
+          })).to.be.true;
+        });
+
+        it("should return false when recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "T",
+            children: [new XmlValueNode("test")]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "T",
+            children: []
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
+        });
+      });
+
+      context("this has no children, other does", () => {
+        it("should return true when not recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "T",
+            children: [new XmlValueNode("test")]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "T",
+            children: []
+          });
+
+          expect(otherNode.equals(thisNode, {
+            recursionLevels: 0
+          })).to.be.true;
+        });
+
+        it("should return false when recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "T",
+            children: [new XmlValueNode("test")]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "T",
+            children: []
+          });
+
+          expect(otherNode.equals(thisNode)).to.be.false;
+        });
+      });
+
+      context("this has a subset of other's children", () => {
+        it("should return true when not recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("first")
+            ]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("first"),
+              new XmlValueNode("second")
+            ]
+          });
+
+          expect(thisNode.equals(otherNode, {
+            recursionLevels: 0
+          })).to.be.true;
+        });
+
+        it("should return false when recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("first")
+            ]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("first"),
+              new XmlValueNode("second")
+            ]
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
+        });
+      });
+
+      context("other has a subset of this's children", () => {
+        it("should return true when not recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("first"),
+              new XmlValueNode("second")
+            ]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("first"),
+            ]
+          });
+
+          expect(thisNode.equals(otherNode, {
+            recursionLevels: 0
+          })).to.be.true;
+        });
+
+        it("should return false when recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("first"),
+              new XmlValueNode("second")
+            ]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "T",
+            children: [
+              new XmlValueNode("first"),
+            ]
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
+        });
+      });
+
+      context("same number of children, but they're different", () => {
+        it("should return true when not recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "L",
+            children: [
+              new XmlValueNode("first"),
+              new XmlValueNode("second"),
+            ]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "L",
+            children: [
+              new XmlValueNode("third"),
+              new XmlValueNode("fourth"),
+            ]
+          });
+
+          expect(thisNode.equals(otherNode, {
+            recursionLevels: 0
+          })).to.be.true;
+        });
+
+        it("should return false when recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "L",
+            children: [
+              new XmlValueNode("first"),
+              new XmlValueNode("second"),
+            ]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "L",
+            children: [
+              new XmlValueNode("third"),
+              new XmlValueNode("fourth"),
+            ]
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
+        });
+      });
+
+      context("same children, different order", () => {
+        it("should return true when not recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "L",
+            children: [
+              new XmlValueNode("first"),
+              new XmlValueNode("second"),
+            ]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "L",
+            children: [
+              new XmlValueNode("second"),
+              new XmlValueNode("first"),
+            ]
+          });
+
+          expect(thisNode.equals(otherNode, {
+            recursionLevels: 0
+          })).to.be.true;
+        });
+
+        it("should return false when recurring", () => {
+          const thisNode = new XmlElementNode({
+            tag: "L",
+            children: [
+              new XmlValueNode("first"),
+              new XmlValueNode("second"),
+            ]
+          });
+
+          const otherNode = new XmlElementNode({
+            tag: "L",
+            children: [
+              new XmlValueNode("second"),
+              new XmlValueNode("first"),
+            ]
+          });
+
+          expect(thisNode.equals(otherNode)).to.be.false;
+        });
+      });
+    });
+
+    context("excludeAttributes", () => {
+      it("should not pass on when recurring to children", () => {
+        const thisNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "first_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "second_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "disabled"
+              }
+            })
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          excludeAttributes: ["n"]
+        })).to.be.false;
+      });
+
+      it("should not consider the listed attributes in parent", () => {
+        const thisNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "first_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "second_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          excludeAttributes: ["n"]
+        })).to.be.true;
+      });
+    });
+
+    context("excludeAttributesRecursive", () => {
+      it("should pass on when recurring to children", () => {
+        const thisNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "first_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "second_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "disabled"
+              }
+            })
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          excludeAttributesRecursive: ["n"]
+        })).to.be.true;
+      });
+
+      it("should not consider the listed attributes in parent", () => {
+        const thisNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "first_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "second_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          excludeAttributesRecursive: ["n"]
+        })).to.be.true;
+      });
+    });
+
+    context("recursionLevels", () => {
+      it("should not mutate the passed in object", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlValueNode("first"),
+            new XmlValueNode("second"),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlValueNode("third"),
+            new XmlValueNode("fourth"),
+          ]
+        });
+
+        const options = { recursionLevels: 1 };
+        expect(thisNode.equals(otherNode, options)).to.be.false;
+        expect(options.recursionLevels).to.equal(1);
+      });
+
+      it("should compare all descendants if not provided", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("first")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("second")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode)).to.be.false;
+      });
+
+      it("should not compare children if recursionLevels = 0", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("first")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "V",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("first")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          recursionLevels: 0
+        })).to.be.true;
+      });
+
+      it("should return true if children are equal and recursionLevels = 1", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("first")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("second")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          recursionLevels: 1
+        })).to.be.true;
+      });
+
+      it("should return false if children aren't equal and recursionLevels = 1", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("first")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "V",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("second")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          recursionLevels: 1
+        })).to.be.false;
+      });
+
+      it("should return true if grandchildren are equal and recursionLevels = 2", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("first")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("first")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          recursionLevels: 2
+        })).to.be.true;
+      });
+
+      it("should return false if grandchildren are not equal and recursionLevels = 2", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something"
+                  },
+                  children: [
+                    new XmlValueNode("first")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          children: [
+            new XmlElementNode({
+              tag: "U",
+              children: [
+                new XmlElementNode({
+                  tag: "T",
+                  attributes: {
+                    n: "something_else"
+                  },
+                  children: [
+                    new XmlValueNode("second")
+                  ]
+                })
+              ]
+            }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          recursionLevels: 2
+        })).to.be.false;
+      });
+    });
+
+    context("strictTypes", () => {
+      it("should be passed on to child nodes", () => {
+        const thisNode = new XmlElementNode({
+          tag: "L",
+          attributes: {
+            n: "some_list"
+          },
+          children: [
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(true)] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode(123)] }),
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "L",
+          attributes: {
+            n: "some_list"
+          },
+          children: [
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode("True")] }),
+            new XmlElementNode({ tag: "T", children: [new XmlValueNode("123")] }),
+          ]
+        });
+
+        expect(thisNode.equals(otherNode)).to.be.true;
+        expect(thisNode.equals(otherNode, { strictTypes: false })).to.be.true;
+        expect(thisNode.equals(otherNode, { strictTypes: true })).to.be.false;
+      });
     });
   });
 

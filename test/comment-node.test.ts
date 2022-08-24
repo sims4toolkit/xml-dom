@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { XmlCommentNode } from "../dst/xml";
+import { XmlCommentNode, XmlElementNode, XmlValueNode } from "../dst/xml";
 
 describe('XmlCommentNode', function () {
   const newNode = (value = "Comment") => new XmlCommentNode(value);
@@ -187,6 +187,41 @@ describe('XmlCommentNode', function () {
     it('should throw', function () {
       const node = newNode();
       expect(() => node.deepSort()).to.throw();
+    });
+  });
+
+  describe("#equals()", () => {
+    it("should return false when other is an element node with the same inner value", () => {
+      const thisNode = new XmlCommentNode("test");
+      const otherNode = new XmlElementNode({
+        tag: "T",
+        children: [thisNode]
+      });
+
+      expect(thisNode.equals(otherNode)).to.be.false;
+    });
+
+    it("should return false when other is a value node with the same value", () => {
+      const thisNode = new XmlCommentNode("test");
+      const otherNode = new XmlValueNode("test");
+      expect(thisNode.equals(otherNode)).to.be.false;
+    });
+
+    it("should return false when other is a comment node with different value", () => {
+      const thisNode = new XmlCommentNode("test1");
+      const otherNode = new XmlCommentNode("test2");
+      expect(thisNode.equals(otherNode)).to.be.false;
+    });
+
+    it("should return true when other is the exact same object", () => {
+      const node = new XmlCommentNode("test");
+      expect(node.equals(node)).to.be.true;
+    });
+
+    it("should return true when other is a comment node with the same value", () => {
+      const thisNode = new XmlCommentNode("test");
+      const otherNode = new XmlCommentNode("test");
+      expect(thisNode.equals(otherNode)).to.be.true;
     });
   });
 
