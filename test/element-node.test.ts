@@ -440,37 +440,107 @@ describe('XmlElementNode', function () {
   });
 
   describe("#equals()", () => {
+    context("other has same tag, attrs, and children", () => {
+      it("should return true", () => {
+        // TODO:
+      });
+    });
+
     context("other is not an XmlElementNode", () => {
-      // TODO:
+      it("should be false if other is a wrapper node with same tag & children", () => {
+        // TODO:
+      });
+
+      it("should be false if other is a value node with same inner value", () => {
+        // TODO:
+      });
+
+      it("should be false if other is a comment node with same inner value", () => {
+        // TODO:
+      });
+
+      it("should be false if other is a document that contains this element as its root", () => {
+        // TODO:
+      });
     });
 
     context("other has different tag", () => {
-      // TODO:
+      it("should return false", () => {
+        const thisNode = new XmlElementNode({ tag: "T" });
+        const otherNode = new XmlElementNode({ tag: "L" });
+        expect(thisNode.equals(otherNode)).to.be.false;
+      });
     });
 
     context("other has different attributes", () => {
       context("this has attributes, other doesn't", () => {
-        // TODO:
+        it("should return true if all of this's attrs are excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if at least one of this's attrs are not excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if no attrs are excluded", () => {
+          // TODO:
+        });
       });
 
       context("this has no attributes, other does", () => {
-        // TODO:
+        it("should return true if all of other's attrs are excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if at least one of other's attrs are not excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if no attrs are excluded", () => {
+          // TODO:
+        });
       });
 
-      context("only difference is an excluded attribute", () => {
-        // TODO:
-      });
+      context("this and other have the same attribute keys", () => {
+        it("should return true if mismatched attrs are excluded", () => {
+          // TODO:
+        });
 
-      context("only difference is an excluded attribute in a child", () => {
-        // TODO:
+        it("should return false if at least one mismatched attr is not excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if no attrs are excluded", () => {
+          // TODO:
+        });
       });
 
       context("this has a subset of other's attributes", () => {
-        // TODO:
+        it("should return true if the missing attr is excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if the missing attr is not excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if no attrs are excluded", () => {
+          // TODO:
+        });
       });
 
       context("other has a subset of this's attributes", () => {
-        // TODO:
+        it("should return true if the missing attr is excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if the missing attr is not excluded", () => {
+          // TODO:
+        });
+
+        it("should return false if no attrs are excluded", () => {
+          // TODO:
+        });
       });
     });
 
@@ -574,6 +644,12 @@ describe('XmlElementNode', function () {
       });
 
       it("should only compare children & grandchildren if recursionLevels = 1", () => {
+        // TODO:
+      });
+    });
+
+    context("strictTypes", () => {
+      it("should be passed on to child nodes", () => {
         // TODO:
       });
     });
