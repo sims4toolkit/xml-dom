@@ -922,21 +922,157 @@ describe('XmlElementNode', function () {
 
     context("excludeAttributes", () => {
       it("should not pass on when recurring to children", () => {
-        // TODO:
+        const thisNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "first_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "second_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "disabled"
+              }
+            })
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          excludeAttributes: ["n"]
+        })).to.be.false;
       });
 
       it("should not consider the listed attributes in parent", () => {
-        // TODO:
+        const thisNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "first_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "second_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          excludeAttributes: ["n"]
+        })).to.be.true;
       });
     });
 
     context("excludeAttributesRecursive", () => {
       it("should pass on when recurring to children", () => {
-        // TODO:
+        const thisNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "first_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "second_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "disabled"
+              }
+            })
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          excludeAttributesRecursive: ["n"]
+        })).to.be.true;
       });
 
       it("should not consider the listed attributes in parent", () => {
-        // TODO:
+        const thisNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "first_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        const otherNode = new XmlElementNode({
+          tag: "V",
+          attributes: {
+            n: "second_variant",
+            t: "enabled"
+          },
+          children: [
+            new XmlElementNode({
+              tag: "T",
+              attributes: {
+                n: "enabled"
+              }
+            })
+          ]
+        });
+
+        expect(thisNode.equals(otherNode, {
+          excludeAttributesRecursive: ["n"]
+        })).to.be.true;
       });
     });
 
