@@ -439,6 +439,146 @@ describe('XmlElementNode', function () {
     });
   });
 
+  describe("#equals()", () => {
+    context("other is not an XmlElementNode", () => {
+      // TODO:
+    });
+
+    context("other has different tag", () => {
+      // TODO:
+    });
+
+    context("other has different attributes", () => {
+      context("this has attributes, other doesn't", () => {
+        // TODO:
+      });
+
+      context("this has no attributes, other does", () => {
+        // TODO:
+      });
+
+      context("only difference is an excluded attribute", () => {
+        // TODO:
+      });
+
+      context("only difference is an excluded attribute in a child", () => {
+        // TODO:
+      });
+
+      context("this has a subset of other's attributes", () => {
+        // TODO:
+      });
+
+      context("other has a subset of this's attributes", () => {
+        // TODO:
+      });
+    });
+
+    context("other has different children", () => {
+      context("this has children, other doesn't", () => {
+        it("should return true when not recurring", () => {
+          // TODO:
+        });
+
+        it("should return false when recurring", () => {
+          // TODO:
+        });
+      });
+
+      context("this has no children, other does", () => {
+        it("should return true when not recurring", () => {
+          // TODO:
+        });
+
+        it("should return false when recurring", () => {
+          // TODO:
+        });
+      });
+
+      context("this has a subset of other's children", () => {
+        it("should return true when not recurring", () => {
+          // TODO:
+        });
+
+        it("should return false when recurring", () => {
+          // TODO:
+        });
+      });
+
+      context("other has a subset of this's children", () => {
+        it("should return true when not recurring", () => {
+          // TODO:
+        });
+
+        it("should return false when recurring", () => {
+          // TODO:
+        });
+      });
+
+      context("same number of children, but they're different", () => {
+        it("should return true when not recurring", () => {
+          // TODO:
+        });
+
+        it("should return false when recurring", () => {
+          // TODO:
+        });
+      });
+
+      context("same children, different order", () => {
+        it("should return true when not recurring", () => {
+          // TODO:
+        });
+
+        it("should return false when recurring", () => {
+          // TODO:
+        });
+      });
+    });
+
+    context("excludeAttributes", () => {
+      it("should not pass on when recurring to children", () => {
+        // TODO:
+      });
+
+      it("should not consider the listed attributes in parent", () => {
+        // TODO:
+      });
+    });
+
+    context("excludeAttributesRecursive", () => {
+      it("should pass on when recurring to children", () => {
+        // TODO:
+      });
+
+      it("should not consider the listed attributes in parent", () => {
+        // TODO:
+      });
+    });
+
+    context("recursionLevels", () => {
+      it("should not mutate the passed in object", () => {
+        // TODO:
+      });
+
+      it("should compare all descendants if not provided", () => {
+        // TODO:
+      });
+
+      it("should not compare children if recursionLevels = 0", () => {
+        // TODO:
+      });
+
+      it("should only compare children if recursionLevels = 1", () => {
+        // TODO:
+      });
+
+      it("should only compare children & grandchildren if recursionLevels = 1", () => {
+        // TODO:
+      });
+    });
+  });
+
   describe("#findChild()", () => {
     it("should return undefined if the child doesn't exist", () => {
       const node = new XmlElementNode({
