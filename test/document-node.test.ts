@@ -1120,6 +1120,19 @@ describe('XmlDocumentNode', function () {
     });
   });
 
+  describe("#equals()", () => {
+    it("should be true for another document with the same tag, attrs, and root", () => {
+      // TODO:
+    });
+
+    it("should be false for the element node that is this document's root", () => {
+      // TODO:
+    });
+
+    // NOTE: child/attribute logic is tested more thoroughly in XmlElementNode,
+    // and all XmlNodes shared the exact same code for these functions
+  });
+
   describe("#findChild()", () => {
     it("should return undefined", () => {
       const node = newNode();

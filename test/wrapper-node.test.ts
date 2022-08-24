@@ -419,9 +419,8 @@ describe("XmlWrapperNode", () => {
       // TODO:
     });
 
-    // NOTE: Most child logic is tested in XmlElementNode, no need to re-write
-    // the same tests here (especially when XmlWrapperNodes are like... never
-    // going to be compared, ever).
+    // NOTE: child/attribute logic is tested more thoroughly in XmlElementNode,
+    // and all XmlNodes shared the exact same code for these functions
   });
 
   describe("#findChild()", () => {
