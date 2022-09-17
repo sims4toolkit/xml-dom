@@ -18,7 +18,7 @@ export interface CompleteXmlFormattingOptions extends Required<XmlFormattingOpti
 /** An object that references a specific recycled node. */
 export interface RecycledNodeRef<T extends XmlNode> {
   /** The globally unique ID for this node. */
-  id: number;
+  id: bigint;
 
   /** The actual node object. */
   node: T;
@@ -68,7 +68,7 @@ export interface RecycledNodesCache {
   /**
    * The unique ID to use for the next node.
    */
-  nextId: number;
+  nextId: bigint;
 
   /**
    * Mapping of value nodes.
@@ -161,6 +161,7 @@ export interface XmlParsingOptions extends Partial<{
   /**
    * An object that is used to keep track of recycled nodes. This does not need
    * to be provided by the user; it will be generated if `recycleNodes = true`.
+   * If provided, recycledNodesSeed will be ignored.
    */
   recycledNodesCache: RecycledNodesCache;
 
@@ -171,6 +172,17 @@ export interface XmlParsingOptions extends Partial<{
    * default.
    */
   recycleNodes: boolean;
+
+  /**
+   * The seed to use for recycled node IDs. This should be a unique 64-bit
+   * integer that ends with 20 null bits. If not provided, the seed is 0. If
+   * recycledNodesCache is provided, then this argument is ignored.
+   * 
+   * NOTE: It is very, very important to provide a unique seed when generating
+   * combined tuning. Using a seed of 0 will cause collisions between the
+   * generated combined tuning and combined tuning in the BG.
+   */
+  recycledNodesSeed: bigint;
 }> { }
 
 /** The result of parsing XML. */

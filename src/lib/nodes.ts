@@ -755,7 +755,7 @@ function parseXml(
         comments: new Map(),
         elements: new Map(),
         refMap: new Map(),
-        nextId: 0,
+        nextId: options.recycledNodesSeed ?? 0n,
         values: new Map(),
         wrappers: new Map()
       };

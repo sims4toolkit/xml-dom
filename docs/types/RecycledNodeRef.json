@@ -32,7 +32,7 @@
           "name": "id",
           "description": "The globally unique ID for this node.",
           "type": {
-            "name": "number"
+            "name": "bigint"
           }
         },
         {
