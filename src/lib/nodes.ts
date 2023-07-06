@@ -573,7 +573,7 @@ export class XmlElementNode extends XmlNodeBase {
 
     if (this.numChildren === 0) {
       lines.push(`${spaces}<${this.tag}${attrString}/>`);
-    } else if (this.numChildren <= 2 && !this.child.hasChildren) {
+    } else if (this.numChildren <= 2 && !this.children.some(child => child.hasChildren)) {
       const value = this.children.map(child => {
         return shouldWriteChild(child, completeOptions)
           ? child.toXml()
@@ -692,7 +692,7 @@ export class XmlWrapperNode extends XmlNodeBase {
     // tags & children
     if (this.numChildren === 0) {
       lines.push(`${spaces}<?${this.tag}?>`);
-    } else if (this.numChildren <= 2 && !this.child.hasChildren) {
+    } else if (this.numChildren <= 2 && !this.children.some(child => child.hasChildren)) {
       const value = this.children.map(child => child.toXml()).join("");
       lines.push(`${spaces}<?${this.tag} ${value} ?>`);
     } else {

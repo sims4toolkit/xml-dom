@@ -1662,6 +1662,15 @@ describe('XmlElementNode', function () {
       expect(node.toXml()).to.equal(`<T>50</T>`);
     });
 
+    it('should not be on one line if at least one child is an element', function () {
+      const node = new XmlElementNode({
+        tag: 'L',
+        children: [new XmlCommentNode("Test"), new XmlElementNode({ tag: "T" })]
+      });
+
+      expect(node.toXml()).to.equal(`<L>\n  <!--Test-->\n  <T/>\n</L>`);
+    });
+
     it('should be on one line if there are two value/comment children', function () {
       const node = new XmlElementNode({
         tag: 'T',
