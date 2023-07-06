@@ -1,6 +1,7 @@
 {
   "name": "@s4tk/xml-dom",
-  "version": "0.2.5",
+  "version": "0.2.6",
+  "main": "xml.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/sims4toolkit/xml-dom.git"
